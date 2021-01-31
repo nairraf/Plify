@@ -1,3 +1,5 @@
-# Plify ![CI-Tests](https://github.com/nairraf/Plify/workflows/CI-Tests/badge.svg)
+![Dev-Tests](https://github.com/nairraf/Plify/workflows/Dev-Tests/badge.svg)
+
+# Plify 
 PowerShell Hyper-V Manager
 
