@@ -67,11 +67,21 @@ if ($Help) {
 try {
     if ($ActionParams) {
         Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParams"
-        & $($ModuleFound.Name)\$ActionMatch @ActionParams
+        & $ModuleFound\$ActionFound @ActionParams
     } else {
         Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name)"
-        & $($ModuleFound.Name)\$ActionFound
+        & $ModuleFound.Name\$ActionFound
     }
 } catch {
-    Write-Error "unknown module: $($ModuleFound.Name) and/or action $($ActionFound.Name)"
+    $ActionParamsString = "@{"
+    if ($ActionParams.Count -gt 0) {
+        foreach ($key in $ActionParams.Keys) {
+            if ( $ActionParamsString.Length -gt 2) {
+                $ActionParamsString += ';'
+            }
+            $ActionParamsString += "$key=$($ActionParams[$key] )"
+        }
+    }
+    $ActionParamsString += "}"
+    Write-Error -Message "Error Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
 }
