@@ -55,7 +55,7 @@ if ($Help) {
     
     if ($null -ne $ModuleFound -and $null -ne $ActionFound) {
         Write-Debug "Getting Module Help Action: $($ModuleFound.Name)\$ActionFound -Help"
-        & $($ModuleFound.Name)\$ActionFound -Help 
+        & $ModuleFound\$ActionFound -Help 
         Exit
     }
 

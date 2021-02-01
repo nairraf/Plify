@@ -1,7 +1,8 @@
 function Get-PlifyHelp() {
     param (
         [Parameter(Mandatory=$false)] [string] $Module,
-        [Parameter(Mandatory=$false)] [string] $ModuleMessage
+        [Parameter(Mandatory=$false)] [string] $ModuleMessage,
+        [Parameter(Mandatory=$false)] [switch] $Help
     )
     Write-Host ""
     Write-Host "Usage:"
