@@ -21,6 +21,18 @@ if ($Flush) {
     Remove-Module Plify*
 }
 
+# get friendly output for the $ActionParams dictionary
+$ActionParamsString = "@{"
+if ($ActionParams.Count -gt 0) {
+    foreach ($key in $ActionParams.Keys) {
+        if ( $ActionParamsString.Length -gt 2) {
+            $ActionParamsString += "; "
+        }
+        $ActionParamsString += "$key=`"$($ActionParams[$key])`""
+    }
+}
+$ActionParamsString += "}"
+
 # route requests via naming convention
 if ( -not [string]::IsNullOrEmpty($Module) ) {
     $ModuleName = PlifyRouter\Build-PlifyModuleName -ModuleName $Module
@@ -40,11 +52,12 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
     }
 }
 
+# see if we found a valid module/action, if not redirect to help
 if ($null -eq $ModuleFound -or $null -eq $ActionFound) {
     $Help = $true
 }
 
-## see if help has been requested
+## see if help has been requested, if so display help and exit
 if ($Help) {
     if ( $null -ne $ModuleFound -and $null -eq $ActionFound) {
         $HelpModule = "$($ModuleFound.Name)\Get-$($ModuleFound.Name)Help"
@@ -66,22 +79,12 @@ if ($Help) {
 # call the requested module, action and pass on action parameters
 try {
     if ($ActionParams) {
-        Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParams"
+        Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
         & $ModuleFound\$ActionFound @ActionParams
     } else {
         Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name)"
         & $ModuleFound.Name\$ActionFound
     }
 } catch {
-    $ActionParamsString = "@{"
-    if ($ActionParams.Count -gt 0) {
-        foreach ($key in $ActionParams.Keys) {
-            if ( $ActionParamsString.Length -gt 2) {
-                $ActionParamsString += ';'
-            }
-            $ActionParamsString += "$key=$($ActionParams[$key] )"
-        }
-    }
-    $ActionParamsString += "}"
     Write-Error -Message "Error Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
 }
