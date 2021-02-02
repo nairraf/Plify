@@ -24,6 +24,7 @@ function Invoke-CISetup()
 
     if ( (Get-Module -name PSScriptAnalyzer -ListAvailable).Count -eq 0) {
         Write-Output "Installing Module: PSScriptAnalyzer"
+        Install-Module -Name PSScriptAnalyzer -Scope CurrentUser
     }
 
     Import-Module PSScriptAnalyzer
