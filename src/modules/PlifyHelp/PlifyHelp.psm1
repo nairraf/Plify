@@ -5,18 +5,19 @@ function Get-PlifyHelp() {
         [Parameter(Mandatory=$false)] [string] $ModuleMessage,
         [Parameter(Mandatory=$false)] [switch] $Help
     )
-    Write-Host ""
-    Write-Host "Usage:"
-    Write-Host "    plify [module] [action] [action_parameters]"
-    Write-Host ""
-    Write-Host "Available Modules:"
-    Write-Host "    "
+    Write-Debug "-Help is: $Help"
+    Write-Output ""
+    Write-Output "Usage:"
+    Write-Output "    plify [module] [action] [action_parameters]"
+    Write-Output ""
+    Write-Output "Available Modules:"
+    Write-Output "    "
 
 
     if ( -not [string]::IsNullOrEmpty($Module) -and -not [string]::IsNullOrEmpty($ModuleMessage) ) {
-        Write-Host ""
-        Write-Host "Help for Module: $Module"
-        Write-Host $ModuleMessage
+        Write-Output ""
+        Write-Output "Help for Module: $Module"
+        Write-Output $ModuleMessage
     }
 }
 
