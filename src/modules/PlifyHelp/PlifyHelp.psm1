@@ -1,4 +1,5 @@
 function Get-PlifyHelp() {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory=$false)] [string] $Module,
         [Parameter(Mandatory=$false)] [string] $ModuleMessage,

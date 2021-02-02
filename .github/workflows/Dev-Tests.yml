@@ -11,16 +11,8 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       - name: Linting
-        shell: powershell
-        run: |
-              Invoke-ScriptAnalyzer -Path src\*.ps*1 -Recurse -Severity @('Error','Warning') -Outvariable issues
-              $errors   = $issues.Where({$_.Severity -eq 'Error'})
-              $warnings = $issues.Where({$_.Severity -eq 'Warning'})
-              if ($errors) {
-                  Write-Error "There were $($errors.Count) errors and $($warnings.Count) warnings total." -ErrorAction Stop
-              } else {
-                  Write-Output "There were $($errors.Count) errors and $($warnings.Count) warnings total."
-              }
+        shell: pwsh
+        run: src\ci\ci.ps1 analyze
       - name: Running Pester Tests
-        shell: powershell
-        run: Invoke-Pester tests\*.Tests.ps1 -PassThru
+        shell: pwsh
+        run: src\ci\ci.ps1 test

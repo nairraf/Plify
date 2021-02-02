@@ -1,8 +1,9 @@
 #Requires -Modules powershell-yaml
+[CmdletBinding()]
 param(
     [Parameter(Mandatory=$false, Position=0)] [string] $Module,
     [Parameter(Mandatory=$false, Position=1)] [string] $Action,
-    [Parameter(Mandatory=$false, Position=2)] [hashtable] $ActionParams,
+    [Parameter(Mandatory=$false, Position=2)] [hashtable] $ActionParams = @{},
     [Parameter(Mandatory=$false)] [switch] $Help,
     [Parameter(Mandatory=$false)] [switch] $Flush
 )
@@ -21,17 +22,14 @@ if ($Flush) {
     Remove-Module Plify*
 }
 
-# get friendly output for the $ActionParams dictionary
-$ActionParamsString = "@{"
-if ($ActionParams.Count -gt 0) {
-    foreach ($key in $ActionParams.Keys) {
-        if ( $ActionParamsString.Length -gt 2) {
-            $ActionParamsString += "; "
-        }
-        $ActionParamsString += "$key=`"$($ActionParams[$key])`""
-    }
+# test if we have a verbose or debug flag and pass it on so modules can use them
+$extraFlags = @{
+    Verbose = if ($PSBoundParameters.Verbose -eq $true) {$true} else {$false};
+    Debug = if ($PSBoundParameters.Debug -eq $true) {$true} else {$false};
 }
-$ActionParamsString += "}"
+
+# get friendly output for the $ActionParams dictionary
+$ActionParamsString = PlifyUtils\Build-PlifyStringFromHash $ActionParams
 
 # route requests via naming convention
 if ( -not [string]::IsNullOrEmpty($Module) ) {
@@ -62,13 +60,13 @@ if ($Help) {
     if ( $null -ne $ModuleFound -and $null -eq $ActionFound) {
         $HelpModule = "$($ModuleFound.Name)\Get-$($ModuleFound.Name)Help"
         Write-Debug "Getting Default Module Help: $HelpModule"
-        & $HelpModule
+        & $HelpModule @extraFlags
         Exit
     } 
     
     if ($null -ne $ModuleFound -and $null -ne $ActionFound) {
-        Write-Debug "Getting Module Help Action: $($ModuleFound.Name)\$ActionFound -Help"
-        & $ModuleFound\$ActionFound -Help 
+        Write-Debug "Getting Help for Module\Action: $($ModuleFound.Name)\$($ActionFound.Name) -Help"
+        & $ModuleFound\$ActionFound -Help @extraFlags
         Exit
     }
 
@@ -78,12 +76,12 @@ if ($Help) {
 
 # call the requested module, action and pass on action parameters
 try {
-    if ($ActionParams) {
+    if ($ActionParams.Count -gt 0) {
         Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
-        & $ModuleFound\$ActionFound @ActionParams
+        & $ModuleFound\$ActionFound @ActionParams @extraFlags
     } else {
         Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name)"
-        & $ModuleFound.Name\$ActionFound
+        & $ModuleFound.Name\$ActionFound @extraFlags
     }
 } catch {
     Write-Error -Message "Error Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
