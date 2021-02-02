@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - name: Linting
+      - name: Code Linting
         shell: powershell
         run: src\ci\ci.ps1 analyze
       - name: Running Pester Tests
