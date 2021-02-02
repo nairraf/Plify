@@ -33,10 +33,17 @@ function Invoke-CISetup()
  
 function Invoke-CodeAnalysis
 {
-    Invoke-ScriptAnalyzer -Path (Get-Item $PSScriptRoot).Parent.FullName -Severity @('Error', 'Warning') -Recurse -EnableExit
+    Invoke-ScriptAnalyzer -Path (Get-Item $PSScriptRoot).Parent.FullName -Severity @('Error', 'Warning') -Recurse -OutVariable issues
+    $errors   = $issues.Where({$_.Severity -eq 'Error'})
+    $warnings = $issues.Where({$_.Severity -eq 'Warning'})
+    if ($errors) {
+        Write-Error "There were $($errors.Count) errors and $($warnings.Count) warnings total." -ErrorAction Stop
+    } else {
+        Write-Output "There were $($errors.Count) errors and $($warnings.Count) warnings total."
+    }
 }
  
-function Invoke-CodeTests
+function Invoke-CodeTest
 {
     # srcDirs is used for CodeCoverage. This should be the path where all your source code is
     $ProjectDir = (Get-Item $PSScriptRoot).Parent.Parent.FullName
@@ -78,7 +85,7 @@ function Invoke-CodeTests
     exit
 }
  
-function Deploy-Modules
+function Deploy-Module
 {
     Write-Output "Deploying Code"
 }
@@ -100,13 +107,13 @@ foreach($task in $Tasks){
         }
         "test" {
             Write-Output "Running Pester Tests..."
-            Invoke-CodeTests
+            Invoke-CodeTest
         }
         "deploy" {
             $message = Get-GitCommitMessage
             if($message.ToLower().Contains("[deploy]")) {
                 Write-Output "Deploying Modules..."
-                Deploy-Modules
+                Deploy-Module
             }
             else {
                 Write-Output "Skipping Deploy..."
