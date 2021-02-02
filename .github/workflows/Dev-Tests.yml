@@ -11,8 +11,8 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       - name: Linting
-        shell: pwsh
+        shell: powershell
         run: src\ci\ci.ps1 analyze
       - name: Running Pester Tests
-        shell: pwsh
+        shell: powershell
         run: src\ci\ci.ps1 test
