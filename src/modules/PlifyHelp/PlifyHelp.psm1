@@ -35,7 +35,7 @@ function Get-PlifyHelp() {
     }
 }
 
-function Get-PlifyHelpText(){
+function Get-PlifyHelpText() {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)] [string] $Module,
@@ -54,18 +54,18 @@ function Get-PlifyHelpText(){
     Write-Debug "Action Help File: $ActionHelpFileName"
     Write-Debug "Module Help File: $ModuleHelpFileName"
 
-    # try the action file first
-    if (Test-Path -Path "$ModuleRoot\$ActionHelpFileName" ) {
-        Write-Debug "Loading Help File: $ModuleRoot\$ActionHelpFileName"
-        Write-PlifyConsoleHelpText -FilePath "$ModuleRoot\$ActionHelpFileName"
-        return
-    }
+    # try the Action help file first, then the Module help file if the action one isn't found
+    $helpFiles = @(
+        "$ModuleRoot\$ActionHelpFileName"
+        "$ModuleRoot\$ModuleHelpFileName"
+    )
 
-    # try the module file if the action file fails
-    if (Test-Path -Path "$ModuleRoot\$ModuleHelpFileName" ) {
-        Write-Debug "Loading Help File: $ModuleRoot\$ModuleHelpFileName"
-        Write-PlifyConsoleHelpText -FilePath "$ModuleRoot\$ModuleHelpFileName"
-        return
+    foreach ($file in $helpFiles) {
+        if (Test-Path -Path "$file") {
+            Write-Debug "Loading Help File: $file"
+            Write-PlifyConsoleHelpText -FilePath "$file"
+            return
+        }
     }
 }
 
