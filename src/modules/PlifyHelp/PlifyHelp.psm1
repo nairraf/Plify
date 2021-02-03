@@ -19,7 +19,6 @@ function Get-PlifyHelp() {
     # Always display basic help first
     Get-PlifyHelpText -Module "PlifyHelp" -Action "default"
 
-
     # find and print the available Modules that are installed
     foreach ($folder in Get-ChildItem -Path ((Get-Item $PSScriptRoot).Parent.FullName) ) {
         $moduleName = $folder.BaseName.Replace("Plify","")
@@ -33,6 +32,8 @@ function Get-PlifyHelp() {
     if ($Module -ne "PlifyHelp") {
        Get-PlifyHelpText -Module $Module -Action $Action
     }
+
+    Write-Output ""
 }
 
 function Get-PlifyHelpText() {
