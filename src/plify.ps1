@@ -58,19 +58,18 @@ if ($null -eq $ModuleFound -or $null -eq $ActionFound) {
 ## see if help has been requested, if so display help and exit
 if ($Help) {
     if ( $null -ne $ModuleFound -and $null -eq $ActionFound) {
-        $HelpModule = "$($ModuleFound.Name)\Get-$($ModuleFound.Name)Help"
-        Write-Debug "Getting Default Module Help: $HelpModule"
-        & $HelpModule @extraFlags
+        Write-Debug "Getting Help for Module: $($ModuleFound.Name)"
+        PlifyHelp\Get-PlifyHelp -Module $ModuleFound.Name @extraFlags
         Exit
     } 
     
     if ($null -ne $ModuleFound -and $null -ne $ActionFound) {
-        Write-Debug "Getting Help for Module\Action: $($ModuleFound.Name)\$($ActionFound.Name) -Help"
-        & $ModuleFound\$ActionFound -Help @extraFlags
+        Write-Debug "Getting Help for Module\Action: $($ModuleFound.Name)\$($ActionFound.Name)"
+        PlifyHelp\Get-PlifyHelp -Module $ModuleFound.Name -Action $ActionFound.Name @extraFlags
         Exit
     }
 
-    PlifyHelp\Get-PlifyHelp
+    PlifyHelp\Get-PlifyHelp @extraFlags
     Exit
 }
 
@@ -81,7 +80,7 @@ try {
         & $ModuleFound\$ActionFound @ActionParams @extraFlags
     } else {
         Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name)"
-        & $ModuleFound.Name\$ActionFound @extraFlags
+        & $ModuleFound\$ActionFound @extraFlags
     }
 } catch {
     Write-Error -Message "Error Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
