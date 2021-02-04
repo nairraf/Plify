@@ -1,4 +1,3 @@
-#Requires -Modules powershell-yaml
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$false, Position=0)] [string] $Module,
