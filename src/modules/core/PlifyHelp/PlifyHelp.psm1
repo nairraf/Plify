@@ -19,13 +19,10 @@ function Get-PlifyHelp() {
     # Always display basic help first
     Get-PlifyHelpText -Module "PlifyHelp" -Action "default"
 
-    # find and print the available Modules that are installed
-    foreach ($folder in Get-ChildItem -Path ((Get-Item $PSScriptRoot).Parent.FullName) ) {
+    # find and print the available App Modules that are installed
+    foreach ($folder in Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.Parent.FullName + "$([System.IO.Path]::DirectorySeparatorChar)app") ) {
         $moduleName = $folder.BaseName.Replace("Plify","")
-        $bypassModules = @("help","utils","router")
-        if (-not $bypassModules.Contains($moduleName.ToLower())) {
-            Write-Output "      $moduleName"
-        }
+        Write-Output "      $moduleName"
     }
 
     # Get the appropriate .help file for the requested mnodule/action and display it.
