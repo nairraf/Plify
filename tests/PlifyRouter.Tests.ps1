@@ -1,6 +1,11 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
 BeforeAll {
     . $PSSCriptRoot\beforeAll.ps1
+
+    Get-Module -Name PlifyTestModule | Remove-Module
+    New-Module -Name PlifyTestModule -ScriptBlock {
+        Function TestAction { return "TestAction" }
+    } | Import-Module -Force
 }
 
 Describe 'Get-PlifyVerb Returns Proper Verb' {
@@ -18,5 +23,53 @@ Describe 'Get-PlifyVerb Returns Proper Verb' {
 
         $GetVerb = PlifyRouter\Get-PlifyVerb($Name)
         $GetVerb | Should -BeExactly $Expected
+    }
+}
+
+Describe 'Get-PlifyModule returns expected Modules' {
+    BeforeEach {
+        Get-Module PlifyRouter | Remove-Module
+        Import-Module PlifyRouter
+        Mock Get-Module { return 'PlifyGood' } -ParameterFilter { $Name -eq 'plifygood' } -ModuleName PlifyRouter
+        Mock Get-Module { } -ParameterFilter { $Name -eq 'bad' } -ModuleName PlifyRouter
+    }
+    It 'Module <Name> returns <Expected>' -ForEach @(
+        @{ Name = "plifygood"; Expected = "PlifyGood"}
+        @{ Name = "bad"; Expected = $null }
+    ) {
+        param ($Name, $Expected)
+
+        PlifyRouter\Get-PlifyModule -ModuleName $Name | Should -Be $Expected
+    }
+}
+
+
+Describe 'Get-PlifyModuleAction' {
+    It 'Returns Valid ModuleAction' {
+        $Action = PlifyRouter\Get-PlifyModuleAction -Module (Get-Module -Name PlifyTestModule) -ActionName "TestAction"
+        $Action | Should -Be (Get-Module -Name PlifyTestModule).ExportedCommands["TestAction"]
+    }
+
+    It 'Returns Null ModuleAction' {
+        $Action = PlifyRouter\Get-PlifyModuleAction -Module (Get-Module -Name PlifyTestModule) -ActionName "BadAction"
+        $Action | Should -Be $null
+    }
+}
+
+Describe 'Build-PlifyModuleName' {
+
+    It 'Returns "Plify<name>"' {
+        PlifyRouter\Build-PlifyModuleName -ModuleName "Test" | Should -Be "PlifyTest"
+    }
+}
+
+Describe 'Build-PlifyActionName' {
+
+    It 'Returns proper Plify function for Requested Action: <Name>' -ForEach @(
+        @{ Name="show"; Expected="Get-PlifyTestModule" }
+        @{ Name="add"; Expected="New-PlifyTestModule" }
+    ) {
+        param($Name, $Expected)
+        PlifyRouter\Build-PlifyActionName -Module (Get-Module -Name PlifyTestModule) -ActionName $Name | Should -Be $Expected
     }
 }

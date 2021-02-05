@@ -47,7 +47,7 @@ function Invoke-CodeTest
 {
     # srcDirs is used for CodeCoverage. This should be the path where all your source code is
     $ProjectDir = (Get-Item $PSScriptRoot).Parent.Parent.FullName
-    $srcDirs = (Get-ChildItem -Path "$ProjectDir\src" -Filter "*.ps*1" -Exclude @("ci.ps1") -Recurse).FullName
+    $srcDirs = (Get-ChildItem -Path "$ProjectDir\src" -Filter "*.ps*1" -Exclude @("ci.ps1", "plify.ps1") -Recurse).FullName
     # testDirs is where all your paster test files are
     $testDirs = @("$ProjectDir\tests")
 
@@ -74,10 +74,22 @@ function Invoke-CodeTest
     foreach ($hit in $CoverageXML.report.counter.covered) {
         $covered += $hit
     }
-    Write-Output "CodeCoverage Missed Entities: $missed"
-    Write-Output "CodeCoverage Covered Entities: $covered"
+    Write-Output ""
+    Write-Output "Code Coverage Details:"
+    Write-Output ""
+    Write-Output "`tType`t`tMissed`t`tCovered"
+    foreach ($counterType in $CoverageXML.report.counter) {
+        $tabs = "`t`t"
+        if ($CounterType.type.length -gt 6) {
+            $tabs="`t"
+        }
+        Write-Output "`t$($CounterType.type)$tabs$($CounterType.missed)`t`t$($CounterType.covered)"
+    }
+    Write-Output "`t---------------------------------------"
+    Write-Output "`tTotals`t`t$missed`t`t$covered"
+    Write-Output ""
     Write-Output "Total CodeCoverage: $([math]::Round($covered/($missed+$covered)*100, 2))%"
-
+    Write-Output ""
     if ($results.FailedCount -gt 0) {
         exit $results.FailedCount
     }
