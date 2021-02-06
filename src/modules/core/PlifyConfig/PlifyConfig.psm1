@@ -1,6 +1,6 @@
 #Requires -Modules powershell-yaml
 
-function Get-PlifyYamlConfig() {
+function Get-PlifyConfigFromYaml() {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)] [string] $RawYaml
@@ -13,4 +13,4 @@ function Get-PlifyYamlConfig() {
     }
 }
 
-Export-ModuleMember -Function Get-PlifyYamlConfig
+Export-ModuleMember -Function Get-PlifyConfigFromYaml

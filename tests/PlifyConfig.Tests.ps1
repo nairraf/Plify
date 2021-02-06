@@ -3,7 +3,7 @@ BeforeAll {
     . $PSSCriptRoot\beforeAll.ps1
 }
 
-Describe "Get-PlifyYamlConfig" {
+Describe "Get-PlifyConfigFromYaml" {
     BeforeAll {
         $YAML = @'
 - RootDirectory: .plify
@@ -80,24 +80,24 @@ test
     }
 
     It "Returns Dictionary From Valid Yaml" {
-        $tst = Get-PlifyYamlConfig -RawYaml $YAML
+        $tst = Get-PlifyConfigFromYaml -RawYaml $YAML
         $tst.Networks.Count | Should -Be 2
         $tst.VirtualMachines.Count | Should -Be 1
         $tst | Should -BeOfType [hashtable]
     }
 
     It "Returns nothing from bad Yaml" {
-        $tst = Get-PlifyYamlConfig -RawYaml $YamlBad
+        $tst = Get-PlifyConfigFromYaml -RawYaml $YamlBad
         $tst | Should -Be $null
     }
 
     It "Returns nothing from root only" {
-        $tst = Get-PlifyYamlConfig -RawYaml $YamlOnlyRoot
+        $tst = Get-PlifyConfigFromYaml -RawYaml $YamlOnlyRoot
         $tst | Should -Be $null
     }
 
     It "Returns nothing from no root" {
-        $tst = Get-PlifyYamlConfig -RawYaml $YamlNoRoot
+        $tst = Get-PlifyConfigFromYaml -RawYaml $YamlNoRoot
         $tst | Should -Be $null
     }
 }
