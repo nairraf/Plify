@@ -9,19 +9,21 @@ param(
 
 # bootstrap
 ## update Module Path
-$PlifyModulesRoots = Get-ChildItem -Path ($PSScriptRoot + "$([System.IO.Path]::DirectorySeparatorChar)modules") -Directory
-
-foreach ($PlifyPath in $PlifyModulesRoots.FullName) {
-    if ( -not ($env:PSModulePath).ToLower().Contains($PlifyPath.ToLower()) ) {
-        $env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + $PlifyPath
-    }
-}
+$bootStrapScript = "$PSScriptRoot$([System.IO.Path]::DirectorySeparatorChar)functions$([System.IO.Path]::DirectorySeparatorChar)bootstrap.ps1"
+. $bootStrapScript
+Invoke-PlifyBootstrap
 
 # we import modules on demand - no preloading
 # so flush will import all modules, then remove them so that the ones that are re-loaded are fresh
 if ($Flush) {
+    Write-Debug "Removing Plify Modules from current Scope"
     Get-Module -Name Plify* | Import-Module
     Remove-Module Plify*
+    Write-Debug "Removing Plify Functions from current Scope"
+    Get-Item -Path Function:\*Plify* | Remove-Item -ErrorAction SilentlyContinue
+    Write-Debug "Re-Bootstrapping Plify functions and modules"
+    . $bootStrapScript
+    Invoke-PlifyBootstrap
 }
 
 # test if we have a verbose or debug flag and pass it on so modules can use them

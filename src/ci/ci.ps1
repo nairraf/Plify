@@ -74,6 +74,7 @@ function Invoke-CodeTest
     foreach ($hit in $CoverageXML.report.counter.covered) {
         $covered += $hit
     }
+    $TotalCodeCoveratePercent = [math]::Round($covered/($missed+$covered)*100, 2)
     Write-Output ""
     Write-Output "Code Coverage Details:"
     Write-Output ""
@@ -88,8 +89,19 @@ function Invoke-CodeTest
     Write-Output "`t---------------------------------------"
     Write-Output "`tTotals`t`t$missed`t`t$covered"
     Write-Output ""
-    Write-Output "Total CodeCoverage: $([math]::Round($covered/($missed+$covered)*100, 2))%"
+    
+    $DefaultForegroundColor = [console]::ForegroundColor
+    if ($TotalCodeCoveratePercent -ge 85) {
+        [console]::ForegroundColor = "Green"
+    } elseif ($TotalCodeCoveratePercent -ge 60) {
+        [console]::ForegroundColor = "Yellow"
+    } else {
+        [console]::ForegroundColor = "Red"
+    }
+    Write-Output "Total CodeCoverage: $TotalCodeCoveratePercent%"
+    [console]::ForegroundColor = $DefaultForegroundColor
     Write-Output ""
+
     if ($results.FailedCount -gt 0) {
         exit $results.FailedCount
     }

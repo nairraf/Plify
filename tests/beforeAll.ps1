@@ -1,7 +1,9 @@
-$PlifyModulesRoots = Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.FullName + "$([System.IO.Path]::DirectorySeparatorChar)src$([System.IO.Path]::DirectorySeparatorChar)modules") -Directory
+param (
+    [Parameter(Mandatory=$false)] [bool] $CallInvoke = $true
+)
 
-foreach ($PlifyPath in $PlifyModulesRoots.FullName) {
-    if ( -not ($env:PSModulePath).ToLower().Contains($PlifyPath.ToLower()) ) {
-        $env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + $PlifyPath
-    }
+.  "$((Get-Item $PSScriptRoot).Parent.FullName)$([System.IO.Path]::DirectorySeparatorChar)src$([System.IO.Path]::DirectorySeparatorChar)functions$([System.IO.Path]::DirectorySeparatorChar)bootstrap.ps1"
+
+if ($CallInvoke) {
+    Invoke-PlifyBootstrap
 }
