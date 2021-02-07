@@ -40,10 +40,11 @@ function Get-PlifyHelpText() {
         [Parameter(Mandatory=$true)] [string] $Action
     )
 
-    $ModuleRoot = (Get-Item $PSScriptRoot).Parent.FullName
+    $ModuleRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
+    $sep = [System.IO.Path]::DirectorySeparatorChar
 
-    $ActionHelpFileName = "$Module\$Action.help"
-    $ModuleHelpFileName = "$Module\$Module.help"
+    $ActionHelpFileName = "$Module$($sep)$Action.help"
+    $ModuleHelpFileName = "$Module$($sep)$Module.help"
     
     if ($Action.ToLower() -eq "default") {
         $ActionHelpFileName = $ModuleHelpFileName
@@ -53,16 +54,19 @@ function Get-PlifyHelpText() {
     Write-Debug "Module Help File: $ModuleHelpFileName"
 
     # try the Action help file first, then the Module help file if the action one isn't found
-    $helpFiles = @(
-        "$ModuleRoot\$ActionHelpFileName"
-        "$ModuleRoot\$ModuleHelpFileName"
-    )
+    foreach ($dir in (Get-ChildItem -Path $ModuleRoot -Directory)) {
+        $helpFiles = @(
+            "$($dir.FullName)$($sep)$ActionHelpFileName",
+            "$($dir.FullName)$($sep)$ModuleHelpFileName"
+        )
 
-    foreach ($file in $helpFiles) {
-        if (Test-Path -Path "$file") {
-            Write-Debug "Loading Help File: $file"
-            Write-PlifyConsoleHelpText -FilePath "$file"
-            return
+        foreach ($file in $helpFiles) {
+            Write-Debug "Trying Help file: $file"
+            if (Test-Path -Path "$file") {
+                Write-Debug "Loading Help File: $file"
+                Write-PlifyConsoleHelpText -FilePath "$file"
+                return
+            }
         }
     }
 }
