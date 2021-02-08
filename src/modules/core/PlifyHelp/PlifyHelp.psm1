@@ -43,8 +43,11 @@ function Get-PlifyHelpText() {
     $ModuleRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
     $sep = [System.IO.Path]::DirectorySeparatorChar
 
-    $ActionHelpFileName = "$Module$($sep)$Action.help"
-    $ModuleHelpFileName = "$Module$($sep)$Module.help"
+    # figure out the current locale
+    $translation = Get-PlifyTranslation
+
+    $ActionHelpFileName = "$Module$($sep)$Action.$($translation).help"
+    $ModuleHelpFileName = "$Module$($sep)$Module.$($translation).help"
     
     if ($Action.ToLower() -eq "default") {
         $ActionHelpFileName = $ModuleHelpFileName
