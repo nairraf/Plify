@@ -5,7 +5,7 @@
     Please see https://github.com/nairraf/Plify for more details and documentation.
 
 # Usage
-    plify <module> <action> [ @{ ActionParameters } ]
+    plify <module> <action> [ @{ Param1=Value1; Param2=Value2; [...] } ]
 
     <module>                - a valid module name (required)
                               see "Available Modules" below
@@ -13,12 +13,12 @@
     <action>                - a valid action for the specified module (required)
                               see module specific help for valid actions per module
 
-    { ActionPamaters }      - powershell hashtable for valid Action Parameters for the
+    @{ Param=Value [..] }   - powershell hashtable for valid Action Parameters for the
                               requested action. See action specific help for valid
                               Action Parameters
 
 # Module specific help
-    'plify <name of module> -help'          - General module Help
-    'plify <name of module> <action> -help' - Specific module action help
+    'plify <name of module> -help'              - General module Help
+    'plify <name of module> <action> -help'     - Specific module action help
 
 # Available Modules

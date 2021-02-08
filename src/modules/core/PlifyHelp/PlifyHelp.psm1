@@ -82,15 +82,27 @@ function Write-PlifyConsoleHelpText() {
     $OriginalForegroundColor = [Console]::ForegroundColor
 
     foreach ($line in Get-Content -Path "$FilePath") {
-        $lineColor = $false
+        $lineColor = $OriginalForegroundColor
+        if ($line.StartsWith('####')) {
+            $line = $line.Replace('#','').Trim()
+            $lineColor = "Magenta"
+        }
+        if ($line.StartsWith('###')) {
+            $line = $line.Replace('#','').Trim()
+            $lineColor = "Cyan"
+        }
+        if ($line.StartsWith('##')) {
+            $line = $line.Replace('#','').Trim()
+            $lineColor = "DarkBlue"
+        }
         if ($line.StartsWith('#')) {
             $line = $line.Replace('#','').Trim()
-            $lineColor = $true
+            $lineColor = "Green"
         }
 
-        if ($lineColor) { [Console]::ForegroundColor = "Green" }
+        [Console]::ForegroundColor = $lineColor
         Write-Output  "$line"
-        if ($lineColor) { [Console]::ForegroundColor = $OriginalForegroundColor }
+        [Console]::ForegroundColor = $OriginalForegroundColor
     }
 }
 
