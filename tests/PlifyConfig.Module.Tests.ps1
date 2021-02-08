@@ -70,12 +70,10 @@ Describe "Get-PlifyConfigFromYaml" {
 '@
 
         $YamlBad = @'
-test
-- test
-      test
-        - test
- test
-  - test
+- test:
+        invalid: yaml
+        more: invalid yaml
+        and: some more
 '@
     }
 

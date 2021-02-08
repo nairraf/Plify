@@ -46,6 +46,7 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
         Write-Debug "Found Module: $($ModuleFound.Name)"
         if ( -not [string]::IsNullOrEmpty($Action)) {
             $ActionName = PlifyRouter\Build-PlifyActionName -Module $ModuleFound -ActionName $Action
+            Write-Debug "Detected Action Name: $ActionName"
             $ActionFound = PlifyRouter\Get-PlifyModuleAction -Module $ModuleFound -ActionName $ActionName
             if ($null -ne $ActionFound) {
                 Write-Debug "Found Action: $($ActionFound.Name)"

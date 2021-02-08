@@ -2,6 +2,8 @@ function Get-PlifyVerb([string]$Action) {
     $ActionMapping = @{
         "Get" = @("list","show","ls","get")
         "New" = @("new","add","create")
+        "Initialize" = @("init","initialize")
+        "Remove" = @("delete","del","remove","rm")
     }
 
     foreach ($key in $ActionMapping.Keys) {
