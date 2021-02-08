@@ -11,13 +11,13 @@ Describe "Build-PlifyStringFromHash" {
     }
 
     It "Returns String Matching Hashtable keys sorted" {
-        PlifyUtils\Build-PlifyStringFromHash $exmapleHash | Should -Match $returnString
+        Build-PlifyStringFromHash $exmapleHash | Should -Match $returnString
     }
 
     It "Returns default string on empty hashtable" -Foreach @(
         @{ Table= @{} }
     ) {
         param($Table)
-        PlifyUtils\Build-PlifyStringFromHash $Table | Should -Match $defaultString
+        Build-PlifyStringFromHash $Table | Should -Match $defaultString
     }
 }

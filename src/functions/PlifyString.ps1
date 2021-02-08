@@ -1,4 +1,4 @@
-function Build-PlifyStringFromHash() {
+function Global:Build-PlifyStringFromHash() {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, Position=0)] [Hashtable] $hashtable
@@ -20,5 +20,3 @@ function Build-PlifyStringFromHash() {
     $hashString += "}"
     return $hashString
 }
-
-Export-ModuleMember -Function Build-PlifyStringFromHash

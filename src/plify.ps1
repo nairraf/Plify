@@ -33,7 +33,7 @@ $extraFlags = @{
 }
 
 # get friendly output for the $ActionParams dictionary
-$ActionParamsString = PlifyUtils\Build-PlifyStringFromHash $ActionParams
+$ActionParamsString = Build-PlifyStringFromHash $ActionParams
 
 # route requests via naming convention
 if ( -not [string]::IsNullOrEmpty($Module) ) {
