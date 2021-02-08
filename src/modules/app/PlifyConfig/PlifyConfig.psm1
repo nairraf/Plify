@@ -13,4 +13,13 @@ function Get-PlifyConfigFromYaml() {
     }
 }
 
-Export-ModuleMember -Function Get-PlifyConfigFromYaml
+function Initialize-PlifyConfig() {
+    $sep = [system.io.Path]::DirectorySeparatorChar
+    $PlifyConfigDir = "$($env:LOCALAPPDATA)$($sep)Plify"
+    if ( -not (Test-Path -Path $PlifyConfigDir) ) {
+        Write-Debug "Initializing Plify global config dir in appdata\local"
+        New-Item -Path $PlifyConfigDir -ItemType "directory"
+    }
+}
+
+Export-ModuleMember -Function Get-PlifyConfigFromYaml,Initialize-PlifyConfig
