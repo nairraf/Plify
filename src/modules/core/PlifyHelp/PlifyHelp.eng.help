@@ -13,7 +13,7 @@
     <action>                - a valid action for the specified module (required)
                               see module specific help for valid actions per module
 
-    @{ Param=Value [..] }   - powershell hashtable for valid Action Parameters for the
+    @{ Param=Value [..] }   - optional hashtable for valid Action Parameters for the
                               requested action. See action specific help for valid
                               Action Parameters
 

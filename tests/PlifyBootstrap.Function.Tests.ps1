@@ -1,3 +1,4 @@
+#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
 BeforeAll {
     # we do not do anything in this before all, as we are testing the bootstrap process, not using it yet
 }
