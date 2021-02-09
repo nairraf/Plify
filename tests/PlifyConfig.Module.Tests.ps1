@@ -99,3 +99,36 @@ Describe "Get-PlifyConfigFromYaml" {
         $tst | Should -Be $null
     }
 }
+
+Describe 'Initialize-PlifyConfig' {
+    BeforeAll {
+        $sep = [system.io.Path]::DirectorySeparatorChar
+        $temp = (Get-Item $env:Temp).FullName
+        $localPlifyConfigDir = "$temp$($sep)PlifyLocal"
+        $globalPlifyConfigDir = "$temp$($sep)PlifyGlobal"
+        Mock Get-PlifyConfigDir { return $localPlifyConfigDir } -ParameterFilter { $Scope -eq 'local' } -ModuleName PlifyConfig
+        Mock Get-PlifyConfigDir { return $globalPlifyConfigDir } -ParameterFilter { $Scope -eq 'Global' } -ModuleName PlifyConfig
+    }
+
+    It 'Configures global directory when Scope=Global' {
+        if ( (Test-Path -Path "$globalPlifyConfigDir") -eq $true) { Remove-Item -Path $globalPlifyConfigDir -Recurse -Force}
+        Test-Path -Path $globalPlifyConfigDir | Should -Be $false
+        Initialize-PlifyConfig -Scope Global
+        Test-Path -Path $globalPlifyConfigDir | Should -Be $true
+    }
+
+    It 'Configures local directory when Scope=Local' {
+        if ( (Test-Path -Path "$localPlifyConfigDir") -eq $true) { Remove-Item -Path $localPlifyConfigDir -Recurse -Force}
+        Test-Path -Path $localPlifyConfigDir | Should -Be $false
+        Initialize-PlifyConfig -Scope local
+        Test-Path -Path $localPlifyConfigDir | Should -Be $true
+    }
+}
+
+Describe 'Get-PlifyConfigDir' {
+    It 'Should Return <Directory> When Passed <Scope>' {
+        $localAppData = (Get-Item $env:LOCALAPPDATA).FullName
+        (Get-PlifyConfigDir -Scope Local).StartsWith($localAppData) | Should -Be $false
+        (Get-PlifyConfigDir -Scope Global).StartsWith($localAppData) | Should -Be $true
+    }
+}

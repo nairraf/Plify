@@ -13,13 +13,29 @@ function Get-PlifyConfigFromYaml() {
     }
 }
 
+function Get-PlifyConfigDir() {
+    param (
+        [Parameter(Mandatory=$false, Position=0)] [string] $Scope = "local"
+    )
+
+    if ($Scope -eq "global") {
+        $sep = [system.io.Path]::DirectorySeparatorChar
+        $localAppData = (Get-Item $env:LOCALAPPDATA).FullName
+        return "$localAppData$($sep)Plify"
+    } else {
+        return (Get-Location).Path
+    }
+}
+
 function Initialize-PlifyConfig() {
-    $sep = [system.io.Path]::DirectorySeparatorChar
-    $PlifyConfigDir = "$($env:LOCALAPPDATA)$($sep)Plify"
+    param (
+        [Parameter(Mandatory=$false, Position=0)] [string] $Scope = "local"
+    )
+    $PlifyConfigDir = Get-PlifyConfigDir $Scope
     if ( -not (Test-Path -Path $PlifyConfigDir) ) {
-        Write-Debug "Initializing Plify global config dir in appdata\local"
+        Write-Debug "Initializing Plify config dir in $PlifyConfigDir"
         New-Item -Path $PlifyConfigDir -ItemType "directory"
     }
 }
 
-Export-ModuleMember -Function Get-PlifyConfigFromYaml,Initialize-PlifyConfig
+Export-ModuleMember -Function Get-PlifyConfigFromYaml,Initialize-PlifyConfig,Get-PlifyConfigDir
