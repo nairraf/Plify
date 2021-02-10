@@ -15,3 +15,8 @@
 ## Valid Options:
     init                            - initilizes the Plify Configuration directory
     initialize                        see "Scope" for Local vs Global configuration
+
+    get                             - Display the entire configuration depending on Scope
+    show
+    ls
+    list

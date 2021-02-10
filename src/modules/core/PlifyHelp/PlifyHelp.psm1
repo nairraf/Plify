@@ -58,8 +58,8 @@ function Get-PlifyHelpText() {
     # try the Action help file first, then the Module help file if the action one isn't found
     foreach ($dir in (Get-ChildItem -Path $ModuleRoot -Directory)) {
         $helpFiles = @(
-            "$($dir.FullName)$($ds)$ActionHelpFileName",
-            "$($dir.FullName)$($ds)$ModuleHelpFileName"
+            "$($dir.FullName)$($ds)$ModuleHelpFileName",
+            "$($dir.FullName)$($ds)$ActionHelpFileName"
         )
 
         foreach ($file in $helpFiles) {
@@ -67,7 +67,6 @@ function Get-PlifyHelpText() {
             if (Test-Path -Path "$file") {
                 Write-Debug "Loading Help File: $file"
                 Write-PlifyConsoleHelpText -FilePath "$file"
-                return
             }
         }
     }

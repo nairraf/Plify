@@ -1,0 +1,16 @@
+
+### Get-PlifyConfig help
+    Displays the local (default) or global config depending on what Scope is set to
+
+### Valid Action Parameters
+    Scope="Local"|"Global"                  - by default scope is set to local
+
+#### Examples
+    plify config get                        - displays the local plify config
+    plify config get @{ Scope="Local" }
+
+    plify config get @{ Scope="Global" }    - displays the global plify config
+
+#### Action Aliases
+    these aliases can be used instead of get:
+        show, list, ls
