@@ -9,7 +9,7 @@ param(
 
 # bootstrap
 ## update Module Path
-$bootStrapScript = "$PSScriptRoot$([System.IO.Path]::DirectorySeparatorChar)functions$([System.IO.Path]::DirectorySeparatorChar)bootstrap.ps1"
+$bootStrapScript = "$PSScriptRoot$($ds)functions$($ds)bootstrap.ps1"
 . $bootStrapScript
 Invoke-PlifyBootstrap
 
@@ -44,6 +44,7 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
 
     if ($null -ne $ModuleFound) {
         Write-Debug "Found Module: $($ModuleFound.Name)"
+        
         if ( -not [string]::IsNullOrEmpty($Action)) {
             $ActionName = PlifyRouter\Build-PlifyActionName -Module $ModuleFound -ActionName $Action
             Write-Debug "Detected Action Name: $ActionName"

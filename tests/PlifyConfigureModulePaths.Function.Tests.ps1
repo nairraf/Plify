@@ -11,16 +11,15 @@ Describe 'Set-PlifyModuleRoots' {
 
     it 'Should Set Module Path Correctly' {
         $envPathBefore = $env:PSModulePath
-        $sep = [System.IO.Path]::DirectorySeparatorChar
-        $envPathBefore.Contains("Plify$($sep)src$($sep)modules$($sep)app") | Should -Be $false
-        $envPathBefore.Contains("Plify$($sep)src$($sep)modules$($sep)core") | Should -Be $false
-        $envPathBefore.Contains("Plify$($sep)src$($sep)modules$($sep)managers") | Should -Be $false
+        $envPathBefore.Contains("Plify$($ds)src$($ds)modules$($ds)app") | Should -Be $false
+        $envPathBefore.Contains("Plify$($ds)src$($ds)modules$($ds)core") | Should -Be $false
+        $envPathBefore.Contains("Plify$($ds)src$($ds)modules$($ds)managers") | Should -Be $false
            
         Set-PlifyModuleRoots
         $envPathAfter = $env:PSModulePath
-        $envPathAfter.Contains("Plify$($sep)src$($sep)modules$($sep)app") | Should -Be $true
-        $envPathAfter.Contains("Plify$($sep)src$($sep)modules$($sep)core") | Should -Be $true
-        $envPathAfter.Contains("Plify$($sep)src$($sep)modules$($sep)managers") | Should -Be $true
+        $envPathAfter.Contains("Plify$($ds)src$($ds)modules$($ds)app") | Should -Be $true
+        $envPathAfter.Contains("Plify$($ds)src$($ds)modules$($ds)core") | Should -Be $true
+        $envPathAfter.Contains("Plify$($ds)src$($ds)modules$($ds)managers") | Should -Be $true
     }
 }
 
@@ -32,16 +31,15 @@ Describe 'Remove-PlifyModuleRoots' {
 
     it 'Should Remove Plify Module Roots Correctly' {
         $envPathBefore = $env:PSModulePath
-        $sep = [System.IO.Path]::DirectorySeparatorChar
-        $envPathBefore.Contains("Plify$($sep)src$($sep)modules$($sep)app") | Should -Be $true
-        $envPathBefore.Contains("Plify$($sep)src$($sep)modules$($sep)core") | Should -Be $true
-        $envPathBefore.Contains("Plify$($sep)src$($sep)modules$($sep)managers") | Should -Be $true
+        $envPathBefore.Contains("Plify$($ds)src$($ds)modules$($ds)app") | Should -Be $true
+        $envPathBefore.Contains("Plify$($ds)src$($ds)modules$($ds)core") | Should -Be $true
+        $envPathBefore.Contains("Plify$($ds)src$($ds)modules$($ds)managers") | Should -Be $true
            
         Remove-PlifyModuleRoots
         $envPathAfter = $env:PSModulePath
-        $envPathAfter.Contains("Plify$($sep)src$($sep)modules$($sep)app") | Should -Be $false
-        $envPathAfter.Contains("Plify$($sep)src$($sep)modules$($sep)core") | Should -Be $false
-        $envPathAfter.Contains("Plify$($sep)src$($sep)modules$($sep)managers") | Should -Be $false
+        $envPathAfter.Contains("Plify$($ds)src$($ds)modules$($ds)app") | Should -Be $false
+        $envPathAfter.Contains("Plify$($ds)src$($ds)modules$($ds)core") | Should -Be $false
+        $envPathAfter.Contains("Plify$($ds)src$($ds)modules$($ds)managers") | Should -Be $false
     }
     
 }

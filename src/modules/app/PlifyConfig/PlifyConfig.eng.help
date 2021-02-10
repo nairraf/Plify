@@ -15,8 +15,3 @@
 ## Valid Options:
     init                            - initilizes the Plify Configuration directory
     initialize                        see "Scope" for Local vs Global configuration
-
-    delete                          - Removes the Plify Configuration directory
-    remove                            see "Scope" for Local vs Global configuration
-    del
-    rm

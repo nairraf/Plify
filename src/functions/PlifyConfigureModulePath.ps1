@@ -8,7 +8,7 @@ Invoke-PlifyBootstrap
 Set-PlifyModulePath
 #>
 function Global:Set-PlifyModuleRoots() {
-    $PlifyModuleRoots = Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.FullName + "$([System.IO.Path]::DirectorySeparatorChar)modules" ) -Directory
+    $PlifyModuleRoots = Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.FullName + "$($ds)modules" ) -Directory
 
     foreach ($PlifyPath in $PlifyModuleRoots.FullName) {
         if ( -not ($env:PSModulePath).ToLower().Contains($PlifyPath.ToLower()) ) {
@@ -27,13 +27,12 @@ Invoke-PlifyBootstrap
 Remove-PlifyModuleRoots
 #>
 function Global:Remove-PlifyModuleRoots() {
-    $sep = [System.IO.Path]::DirectorySeparatorChar
     $curModPath = $env:PSModulePath.split([System.IO.Path]::PathSeparator)
     $newModPath = @()
     $PlifyBases = @( 
-        "Plify$($sep)src$($sep)modules$($sep)app", 
-        "Plify$($sep)src$($sep)modules$($sep)core", 
-        "Plify$($sep)src$($sep)modules$($sep)managers" 
+        "Plify$($ds)src$($ds)modules$($ds)app", 
+        "Plify$($ds)src$($ds)modules$($ds)core", 
+        "Plify$($ds)src$($ds)modules$($ds)managers" 
     )
     foreach ($dir in $curModPath) {
         $addToModulePath = $true

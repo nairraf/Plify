@@ -100,12 +100,11 @@ Describe "Get-PlifyConfigFromYaml" {
     }
 }
 
-Describe 'Initialize-PlifyConfig' {
+Describe 'Initialize|Get|Set PlifyConfig' {
     BeforeAll {
-        $sep = [system.io.Path]::DirectorySeparatorChar
         $temp = (Get-Item $env:Temp).FullName
-        $localPlifyConfigDir = "$temp$($sep)PlifyLocal"
-        $globalPlifyConfigDir = "$temp$($sep)PlifyGlobal"
+        $localPlifyConfigDir = "$temp$($ds)PlifyLocal"
+        $globalPlifyConfigDir = "$temp$($ds)PlifyGlobal"
         Mock Get-PlifyConfigDir { return $localPlifyConfigDir } -ParameterFilter { $Scope -eq 'local' } -ModuleName PlifyConfig
         Mock Get-PlifyConfigDir { return $globalPlifyConfigDir } -ParameterFilter { $Scope -eq 'Global' } -ModuleName PlifyConfig
     }
@@ -123,12 +122,53 @@ Describe 'Initialize-PlifyConfig' {
         Initialize-PlifyConfig -Scope local
         Test-Path -Path $localPlifyConfigDir | Should -Be $true
     }
+
+    It 'Should create default global configuration' {
+        Test-Path -Path "$globalPlifyConfigDir$($ds)config.yml" | Should -Be $true
+    }
+
+    It 'Should Retrieve Local Plify Config' {
+
+    }
+
+    It 'Should Retrieve Global Plify Config as string' {
+        (Get-PlifyConfig -Scope "Global") -match 'repositories:*' | Should -Be $true
+        (Get-PlifyConfig -Scope "Global").GetType().Name | Should -Be "String"
+    }
+
+    It 'Should Retrieve Global Plify Config as PS Types' {
+        (Get-PlifyConfig -Scope "Global" -ConvertToPS).Keys | Should -Contain "Repositories"
+        (Get-PlifyConfig -Scope "Global" -ConvertToPS).GetType().Name | Should -Be "Hashtable"
+    }
+
+    It 'Should Add a "Test" to the global Plify Config' {
+        $config = Get-PlifyConfig -Scope "Global" -ConvertToPS
+        $config["Test"] = @{}
+        $config["Test"]["key"] = "test value"
+
+        Set-PlifyGlobalConfig -Config $config
+
+        (Get-PlifyConfig -Scope "Global" -ConvertToPS).Keys | Should -Contain "Test"
+        (Get-PlifyConfig -Scope "Global" -ConvertToPS)["Test"]["key"] | Should -Be "test value"
+    }
 }
 
 Describe 'Get-PlifyConfigDir' {
-    It 'Should Return <Directory> When Passed <Scope>' {
+    It 'Should Configure local and global properly' {
         $localAppData = (Get-Item $env:LOCALAPPDATA).FullName
         (Get-PlifyConfigDir -Scope Local).StartsWith($localAppData) | Should -Be $false
         (Get-PlifyConfigDir -Scope Global).StartsWith($localAppData) | Should -Be $true
+    }
+
+    It 'Should Return Correct Plify dir names' -Foreach @(
+        @{ DirName="test" }
+    ){
+        param ($DirName)
+        (Get-PlifyConfigDir -DirName $DirName).EndsWith(".$($DirName)") | Should -Be $true
+    }
+
+    It 'Should Return Default local Plify dir name' {
+        param ($DirName)
+        (Get-PlifyConfigDir).EndsWith(".Plify") | Should -Be $true
     }
 }

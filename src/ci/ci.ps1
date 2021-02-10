@@ -102,6 +102,9 @@ function Invoke-CodeTest
     [console]::ForegroundColor = $DefaultForegroundColor
     Write-Output ""
 
+    # cleanup
+    Remove-Item coverage.xml -Force 
+
     if ($results.FailedCount -gt 0) {
         exit $results.FailedCount
     }

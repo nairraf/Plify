@@ -20,7 +20,7 @@ function Get-PlifyHelp() {
     Get-PlifyHelpText -Module "PlifyHelp" -Action "default"
 
     # find and print the available App Modules that are installed
-    foreach ($folder in Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.Parent.FullName + "$([System.IO.Path]::DirectorySeparatorChar)app") ) {
+    foreach ($folder in Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.Parent.FullName + "$($ds)app") ) {
         $moduleName = $folder.BaseName.Replace("Plify","")
         Write-Output "      $moduleName"
     }
@@ -41,13 +41,12 @@ function Get-PlifyHelpText() {
     )
 
     $ModuleRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
-    $sep = [System.IO.Path]::DirectorySeparatorChar
 
     # figure out the current locale
     $translation = Get-PlifyTranslation
 
-    $ActionHelpFileName = "$Module$($sep)$Action.$($translation).help"
-    $ModuleHelpFileName = "$Module$($sep)$Module.$($translation).help"
+    $ActionHelpFileName = "$Module$($ds)$Action.$($translation).help"
+    $ModuleHelpFileName = "$Module$($ds)$Module.$($translation).help"
     
     if ($Action.ToLower() -eq "default") {
         $ActionHelpFileName = $ModuleHelpFileName
@@ -59,8 +58,8 @@ function Get-PlifyHelpText() {
     # try the Action help file first, then the Module help file if the action one isn't found
     foreach ($dir in (Get-ChildItem -Path $ModuleRoot -Directory)) {
         $helpFiles = @(
-            "$($dir.FullName)$($sep)$ActionHelpFileName",
-            "$($dir.FullName)$($sep)$ModuleHelpFileName"
+            "$($dir.FullName)$($ds)$ActionHelpFileName",
+            "$($dir.FullName)$($ds)$ModuleHelpFileName"
         )
 
         foreach ($file in $helpFiles) {
