@@ -101,47 +101,56 @@ Describe "Get-PlifyConfigFromYaml" {
 }
 
 Describe 'Initialize|Get|Set PlifyConfig' {
-    BeforeAll {
+    BeforeEach {
         $temp = (Get-Item $env:Temp).FullName
         $localPlifyConfigDir = "$temp$($ds)PlifyLocal"
         $globalPlifyConfigDir = "$temp$($ds)PlifyGlobal"
+        if (Test-Path -Path "$localPlifyConfigDir") { Remove-Item -Path $localPlifyConfigDir -Recurse -Force }
+        if (Test-Path -Path "$globalPlifyConfigDir") { Remove-Item -Path $globalPlifyConfigDir -Recurse -Force }
         Mock Get-PlifyConfigDir { return $localPlifyConfigDir } -ParameterFilter { $Scope -eq 'local' } -ModuleName PlifyConfig
         Mock Get-PlifyConfigDir { return $globalPlifyConfigDir } -ParameterFilter { $Scope -eq 'Global' } -ModuleName PlifyConfig
     }
 
+    AfterEach {
+        if (Test-Path -Path "$localPlifyConfigDir") { Remove-Item -Path $localPlifyConfigDir -Recurse -Force }
+        if (Test-Path -Path "$globalPlifyConfigDir") { Remove-Item -Path $globalPlifyConfigDir -Recurse -Force }
+    }
+
     It 'Configures global directory when Scope=Global' {
-        if ( (Test-Path -Path "$globalPlifyConfigDir") -eq $true) { Remove-Item -Path $globalPlifyConfigDir -Recurse -Force}
         Test-Path -Path $globalPlifyConfigDir | Should -Be $false
         Initialize-PlifyConfig -Scope Global
         Test-Path -Path $globalPlifyConfigDir | Should -Be $true
     }
 
     It 'Configures local directory when Scope=Local' {
-        if ( (Test-Path -Path "$localPlifyConfigDir") -eq $true) { Remove-Item -Path $localPlifyConfigDir -Recurse -Force}
         Test-Path -Path $localPlifyConfigDir | Should -Be $false
         Initialize-PlifyConfig -Scope local
         Test-Path -Path $localPlifyConfigDir | Should -Be $true
     }
 
     It 'Should create default global configuration' {
+        Initialize-PlifyConfig -Scope Global
         Test-Path -Path "$globalPlifyConfigDir$($ds)config.yml" | Should -Be $true
     }
 
     It 'Should Retrieve Local Plify Config' {
-
+        # Todo
     }
 
     It 'Should Retrieve Global Plify Config as string' {
+        Initialize-PlifyConfig -Scope Global
         (Get-PlifyConfig -Scope "Global") -match 'repositories:*' | Should -Be $true
         (Get-PlifyConfig -Scope "Global").GetType().Name | Should -Be "String"
     }
 
     It 'Should Retrieve Global Plify Config as PS Types' {
+        Initialize-PlifyConfig -Scope Global
         (Get-PlifyConfig -Scope "Global" -ConvertToPS).Keys | Should -Contain "Repositories"
         (Get-PlifyConfig -Scope "Global" -ConvertToPS).GetType().Name | Should -Be "Hashtable"
     }
 
-    It 'Should Add a "Test" to the global Plify Config' {
+    It 'Should Add a "Test" key/value to the global Plify Config' {
+        Initialize-PlifyConfig -Scope Global
         $config = Get-PlifyConfig -Scope "Global" -ConvertToPS
         $config["Test"] = @{}
         $config["Test"]["key"] = "test value"
@@ -150,6 +159,48 @@ Describe 'Initialize|Get|Set PlifyConfig' {
 
         (Get-PlifyConfig -Scope "Global" -ConvertToPS).Keys | Should -Contain "Test"
         (Get-PlifyConfig -Scope "Global" -ConvertToPS)["Test"]["key"] | Should -Be "test value"
+    }
+
+    It 'Should Modify only the "Test" key/value in the global Plify Config' {
+        Initialize-PlifyConfig -Scope Global
+        $config = Get-PlifyConfig -Scope "Global" -ConvertToPS
+        $config["Test"] = @{Key="New Value"; NewKey="Edit Test"}
+
+        Set-PlifyGlobalConfig -Config $config
+
+        (Get-PlifyConfig -Scope "Global" -ConvertToPS).Keys | Should -Contain "Repositories"
+        (Get-PlifyConfig -Scope "Global" -ConvertToPS).Keys | Should -Contain "Test"
+        (Get-PlifyConfig -Scope "Global" -ConvertToPS)["Test"]["key"] | Should -Be "New Value"
+        (Get-PlifyConfig -Scope "Global" -ConvertToPS)["Test"]["NewKey"] | Should -Be "Edit Test"
+    }
+
+    It 'Should retrieve and update only the "Test" Global config element' {
+        Initialize-PlifyConfig -Scope Global
+
+        # create and save a test config key
+        $config = Get-PlifyConfig -Scope "Global" -ConvertToPS
+        $config["Test"] = @{Key="New Value"; NewKey="Edit Test"}
+        Set-PlifyGlobalConfig -Config $config
+
+        # reload our $config variable to pull in just the Test element
+        $config = Get-PlifyConfig -Scope "Global" -ConvertToPS -RootElement "Test"
+        $config.Keys | Should -Not -Contain "Repositories"
+        $config.Keys | Should -Contain "Test"
+
+        # update the test element
+        $config["Test"] = @{Key="Test 3"; NewKey="Edit Test 3"}
+
+        # save just the Test element to global config
+        # this should only overwrite the Test element
+        Set-PlifyGlobalConfig -Config $config -RootElement "Test"
+
+        # refresh our config and make sure it contains the complete config (default config + our changes)
+        $config = Get-PlifyConfig -Scope "Global" -ConvertToPS
+
+        $config.Keys | Should -Contain "Repositories"
+        $config.Keys | Should -Contain "Test"
+        $config["Test"]["Key"] | Should -Be "Test 3"
+        $config["Test"]["NewKey"] | Should -Be "Edit Test 3"
     }
 }
 

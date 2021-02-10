@@ -71,14 +71,7 @@ function Initialize-PlifyConfig() {
         }
 
         if ($Scope -eq "global") {
-            # Create default global config.yml
-            #$defaultYaml = ConvertFrom-Yaml -Yaml $DefaultGlobalConfigYaml
-            $defaultConfig = @{
-                Repositories = @{ 
-                    'Dev Plify Repository'='devrepo.plify.xyz'; 
-                    'Official Production Plify Repository'='repo.plify.xyz' }
-            }
-            ConvertTo-Yaml -Data $defaultConfig -OutFile "$PlifyConfigDir$($ds)config.yml" -Force
+            ConvertTo-Yaml -Data $defaultPlifyConfigGlobal -OutFile "$PlifyConfigDir$($ds)config.yml" -Force
         }
     }
 }
@@ -86,6 +79,7 @@ function Initialize-PlifyConfig() {
 function Get-PlifyConfig() {
     param(
         [Parameter(Mandatory=$false)] [string] $Scope = "Local",
+        [Parameter(Mandatory=$false)] [string] $RootElement = $null,
         [Parameter(Mandatory=$false)] [switch] $ConvertToPS
     )
 
@@ -94,9 +88,20 @@ function Get-PlifyConfig() {
 
     if ( Test-Path -Path $configFile ) {
         $content = Get-Content $configFile -Raw
-        if ($ConvertToPS) {
+
+        # we convert to PS types if requested or if a RootElement has been requested
+        if ( $ConvertToPS -or [string]::IsNullOrEmpty($RootElement) -eq $false) {
             $content = ConvertFrom-Yaml $content
         }
+
+        # if a Root element has been requested and exists, return just that root element
+        if ([string]::IsNullOrEmpty($RootElement) -eq $false -and $content.keys -contains $RootElement) {
+            $elementContent = @{}
+            $elementContent[$RootElement] = $content[$RootElement]
+            $content = $elementContent
+            $elementContent = $null
+        }
+
         return $content
     } else {
         return "Config File Not found: $configFile"
@@ -105,11 +110,19 @@ function Get-PlifyConfig() {
 
 function Set-PlifyGlobalConfig() {
     param(
-        [Parameter(Mandatory=$true)] [hashtable] $config
+        [Parameter(Mandatory=$true)] [hashtable] $config,
+        [Parameter(Mandatory=$false)] [string] $RootElement = $null
     )
 
     $configDir = Get-PlifyConfigDir -Scope "Global"
     $configFile = "$configDir$($ds)config.yml"
+
+    # if a RootElement has been set, then just update that RootElement only
+    if ( -not [string]::IsNullOrEmpty($RootElement)) {
+        $fullConfig = Get-PlifyConfig -Scope "Global" -ConvertToPS
+        $fullConfig[$RootElement] = $config[$RootElement]
+        $config = $fullConfig
+    }
 
     ConvertTo-Yaml -Data $config -OutFile $configFile -Force
 }

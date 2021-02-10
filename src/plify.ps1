@@ -8,8 +8,10 @@ param(
 )
 
 # bootstrap
-## update Module Path
-$bootStrapScript = "$PSScriptRoot$($ds)functions$($ds)bootstrap.ps1"
+# we set the globals in the bootstrap file so $ds (Directory Seperator Character global) can't ne used here as it doesn't exist yet
+# we set them there so that the globals are also available in our tests. Tests execute the bootstrap as well.
+# in all plify modules/fundtions/tests you can use $ds as the directory seperator character
+$bootStrapScript = "$PSScriptRoot$([system.io.path]::DirectorySeparatorChar)functions$([system.io.path]::DirectorySeparatorChar)bootstrap.ps1"
 . $bootStrapScript
 Invoke-PlifyBootstrap
 
