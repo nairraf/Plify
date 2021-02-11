@@ -3,6 +3,10 @@ $defatulModuleContents = @'
 foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Recurse)) {  
     . $file.FullName
 }
+
+function Get-__FULLMODDULENAME__() {
+
+}
 '@
 
 $DefaultModuleTestContents = @'
@@ -68,7 +72,7 @@ function New-PlifyModule() {
     $defaultPSModule = "$ModuleDirPath$($ds)$Name.psm1"
     if (-not (Test-Path -Path $defaultPSModule)) {
         Write-Output "Creating Default PS Module: $defaultPSModule"
-        $defatulModuleContents | Out-File -FilePath $defaultPSModule 
+        $defatulModuleContents.Repalce('__FULLMODULENAME__', $Name) | Out-File -FilePath $defaultPSModule 
     }
 
     # make sure the default module help file doesn't exist and create it

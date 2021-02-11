@@ -2,15 +2,11 @@ function Get-PlifyHelp() {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$false)] [string] $Module,
-        [Parameter(Mandatory=$false)] [string] $Action
+        [Parameter(Mandatory=$false)] [string] $Action = "default"
     )
   
     if ( [string]::IsNullOrWhiteSpace($Module) ) {
         $Module = "PlifyHelp"
-    }
-
-    if ( [string]::IsNullOrWhiteSpace($Action) ) {
-        $Action = "default"
     }
 
     Write-Debug "Help Module Requested: $Module"
