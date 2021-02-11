@@ -103,7 +103,7 @@ function Invoke-CodeTest
     Write-Output ""
 
     # cleanup
-    Remove-Item coverage.xml -Force 
+    # Remove-Item coverage.xml -Force 
 
     if ($results.FailedCount -gt 0) {
         exit $results.FailedCount

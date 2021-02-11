@@ -5,8 +5,8 @@ $Global:plifyRoot = (Get-Item $PSScriptRoot).Parent.FullName
 $Global:plifyModuleRoot = "$plifyRoot$($ds)modules"
 
 $Global:PlifyModuleAliases = @{
-    "Configuration" = @("config","configuration", "conf")
-    "Repository"     = @("repo","repository")
+    "Configuration" = @("config", "conf")
+    "Repository"     = @("repo")
 }
 
 $Global:PlifyActionMapping = @{
