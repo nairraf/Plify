@@ -9,6 +9,6 @@ Describe 'Get-PlifyHelp' {
         $helpText | should -Contain "overview"
         $helpText | should -Contain "usage"
         $helpText | should -Contain "module specific help"
-        $helpText | should -Contain "Available Modules"
+        $helpText | should -Contain "Available Modules : Module Aliases"
     }
 }
