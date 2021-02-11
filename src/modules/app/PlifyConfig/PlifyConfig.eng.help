@@ -5,18 +5,12 @@
 ## Usage
     plify config [opion] [ @{ Scope=["local"|"global"] } ]
 
-## Available Action Parameters
-    Scope=["local" | "global"]      - Controls if the config module should configure things
-                                      Globally or Locally. The Default is "Local", meaning 
-                                      it will target the local .plify configuration folder
-                                      in the current working directory. Global targets the
-                                      current user's %LOCALAPPDATA%\Plify directory.
+## Available Actions
+    Action                      Action Parameters               Description
+    init                        Scope                           initilizes the Plify Configuration directory
+    initialize                                                  depending on scope
 
-## Valid Options:
-    init                            - initilizes the Plify Configuration directory
-    initialize                        see "Scope" for Local vs Global configuration
-
-    get                             - Display the entire configuration depending on Scope
+    get                         Scope                            Display the entire configuration depending on Scope
     show
     ls
     list

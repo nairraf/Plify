@@ -22,7 +22,7 @@ function Get-PlifyHelp() {
     # find and print the available App Modules that are installed
     foreach ($folder in Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.Parent.FullName + "$($ds)app") ) {
         $moduleName = $folder.BaseName.Replace("Plify","")
-        Write-Output "      $moduleName"
+        Write-Output "`t$moduleName"
     }
 
     # Get the appropriate .help file for the requested mnodule/action and display it.
@@ -47,10 +47,6 @@ function Get-PlifyHelpText() {
 
     $ActionHelpFileName = "$Module$($ds)$Action.$($translation).help"
     $ModuleHelpFileName = "$Module$($ds)$Module.$($translation).help"
-    
-    if ($Action.ToLower() -eq "default") {
-        $ActionHelpFileName = $ModuleHelpFileName
-    }
 
     Write-Debug "Action Help File: $ActionHelpFileName"
     Write-Debug "Module Help File: $ModuleHelpFileName"

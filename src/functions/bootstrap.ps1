@@ -1,5 +1,8 @@
 # Global Variables
 $Global:ds = ([system.io.path]::DirectorySeparatorChar)
+$Global:plifyDevRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
+$Global:plifyRoot = (Get-Item $PSScriptRoot).Parent.FullName
+$Global:plifyModuleRoot = "$plifyRoot$($ds)modules"
 
 <#
 .SYNOPSIS

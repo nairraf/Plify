@@ -1,0 +1,23 @@
+
+### plify config initialize help
+    Initializes the local or global plify configuration.
+    
+    Global Plify configuration is auto-initialized so should 
+    never need to be called manually. 
+    
+    Local Plify configuration targets the .Plify directory in
+    the current folder, and is the default as it's the most
+    used
+
+### Valid Action Parameters
+    Scope="Local"|"Global"                  - by default scope is set to local
+
+#### Examples
+    plify config init                       - initializes the local plify config
+    plify config init @{ Scope="Local" }
+
+    plify config init @{ Scope="Global" }   - initializes the global plify config
+
+#### Action Aliases
+    these aliases can be used instead of Initialize:
+        init

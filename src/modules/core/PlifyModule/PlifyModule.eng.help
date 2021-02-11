@@ -1,0 +1,14 @@
+
+## plify module help
+    plify module is used to create new Plify modules per module type
+    this ensures that modules are created in a standard fashion, with
+    default module, help and test files.
+
+## Usage
+    plify module create @{ Name="MyModuleName"; ModuleType="App" }
+
+## Available Actions
+    Action                      Action Parameters               Description
+    create                      Name,ModuleType                 Creates a new module with the 
+    new                                                         passed Name and ModuleType
+    add

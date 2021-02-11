@@ -1,0 +1,30 @@
+
+### plify module create help
+    'Plify Module Create' creates a new Plify Module with the 
+    passed Name in the target ModuleType directory.
+
+### Valid Action Parameters
+    Name            - The name for the new module. It is not nescesary
+                      to start the module name with 'Plify' as create
+                      will detect that and add the prefix if needed
+                      to enforce naming consistency.
+
+    ModuleRoot      - which directory to use as the module root, relative
+                      to the Plify modules directory. Defaults to "App"
+                      but can be set to any directory name. If this directory
+                      doesn't exist it will be created.
+
+#### Examples
+    plify module create @{ Name="MyModuleName"; ModuleRoot="Managers" }
+        this will create a new module called "MyModuleName in the plify
+        'modules\Managers' directory, and a correspoding .Tests file in 
+        the plify tests directory
+
+    plify module create @{ Name="MyModuleName" }
+        Creates a new module called "MyModuleName" in the default plify
+        modules\App directory. Also create a corresponding .Tests file in
+        the plify tests directory
+        
+#### Action Aliases
+    these aliases can be used instead of new:
+        new, add
