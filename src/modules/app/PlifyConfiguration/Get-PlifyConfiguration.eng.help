@@ -1,5 +1,5 @@
 
-### plify config get help
+### plify configuration get help
     Displays the local (default) or global config depending on what Scope is set to
 
 ### Valid Action Parameters

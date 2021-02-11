@@ -64,6 +64,17 @@ Describe 'Build-PlifyModuleName' {
     It 'Returns "Plify<name>"' {
         PlifyRouter\Build-PlifyModuleName -ModuleName "Test" | Should -Be "PlifyTest"
     }
+
+    It 'Returns valid Module for an alias' -ForEach @(
+        @{ Alias="conf";Module="Configuration"}
+        @{ Alias="config";Module="Configuration"}
+        @{ Alias="configuration";Module="Configuration"}
+        @{ Alias="repo";Module="Repository"}
+        @{ Alias="repoSitory";Module="Repository"}
+    ){
+        param($Alias, $Module)
+        PlifyRouter\Build-PlifyModuleName -ModuleName $Alias | Should -Be "Plify$($Module)"
+    }
 }
 
 Describe 'Build-PlifyActionName' {

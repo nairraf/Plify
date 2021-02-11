@@ -12,7 +12,7 @@ Loads a valid plify local configuraion from a YAML file
 .PARAMETER RawYaml
 a string containing the raw YAML 
 #>
-function Get-PlifyConfigFromYaml() {
+function Get-PlifyConfigurationFromYaml() {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)] [string] $RawYaml
@@ -25,7 +25,7 @@ function Get-PlifyConfigFromYaml() {
     }
 }
 
-function Get-PlifyConfigDir() {
+function Get-PlifyConfigurationDir() {
     param (
         [Parameter(Mandatory=$false, Position=0)] [string] $Scope = "local",
         [Parameter(Mandatory=$false, Position=1)] [string] $DirName = "Plify"
@@ -52,12 +52,12 @@ Local scope (default) creates .plifi/config.yml in the current working directory
 .EXAMPLE
 plifi config init
 #>
-function Initialize-PlifyConfig() {
+function Initialize-PlifyConfiguration() {
     param (
         [Parameter(Mandatory=$false, Position=0)] [string] $Scope = "local"
     )
 
-    $PlifyConfigDir = Get-PlifyConfigDir $Scope
+    $PlifyConfigDir = Get-PlifyConfigurationDir $Scope
     if ( -not (Test-Path -Path $PlifyConfigDir) ) {
         Write-Output "Initializing $Scope Plify config dir: $PlifyConfigDir"
         New-Item -Path $PlifyConfigDir -ItemType "directory" | Out-Null
@@ -76,14 +76,14 @@ function Initialize-PlifyConfig() {
     }
 }
 
-function Get-PlifyConfig() {
+function Get-PlifyConfiguration() {
     param(
         [Parameter(Mandatory=$false)] [string] $Scope = "Local",
         [Parameter(Mandatory=$false)] [string] $RootElement = $null,
         [Parameter(Mandatory=$false)] [switch] $ConvertToPS
     )
 
-    $configDir = Get-PlifyConfigDir -Scope $Scope
+    $configDir = Get-PlifyConfigurationDir -Scope $Scope
     $configFile = "$configDir$($ds)config.yml"
 
     if ( Test-Path -Path $configFile ) {
@@ -114,12 +114,12 @@ function Set-PlifyGlobalConfig() {
         [Parameter(Mandatory=$false)] [string] $RootElement = $null
     )
 
-    $configDir = Get-PlifyConfigDir -Scope "Global"
+    $configDir = Get-PlifyConfigurationDir -Scope "Global"
     $configFile = "$configDir$($ds)config.yml"
 
     # if a RootElement has been set, then just update that RootElement only
     if ( -not [string]::IsNullOrEmpty($RootElement)) {
-        $fullConfig = Get-PlifyConfig -Scope "Global" -ConvertToPS
+        $fullConfig = Get-PlifyConfiguration -Scope "Global" -ConvertToPS
         $fullConfig[$RootElement] = $config[$RootElement]
         $config = $fullConfig
     }
@@ -127,4 +127,4 @@ function Set-PlifyGlobalConfig() {
     ConvertTo-Yaml -Data $config -OutFile $configFile -Force
 }
 
-Export-ModuleMember -Function Get-PlifyConfigFromYaml,Initialize-PlifyConfig,Get-PlifyConfigDir,Get-PlifyConfig,Set-PlifyGlobalConfig
+Export-ModuleMember -Function Get-PlifyConfigurationFromYaml,Initialize-PlifyConfiguration,Get-PlifyConfigurationDir,Get-PlifyConfiguration,Set-PlifyGlobalConfig

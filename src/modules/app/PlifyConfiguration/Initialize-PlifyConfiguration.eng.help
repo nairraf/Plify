@@ -1,5 +1,5 @@
 
-### plify config initialize help
+### plify configuraion initialize help
     Initializes the local or global plify configuration.
     
     Global Plify configuration is auto-initialized so should 

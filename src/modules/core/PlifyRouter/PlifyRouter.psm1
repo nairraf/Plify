@@ -1,13 +1,6 @@
 function Get-PlifyVerb([string]$Action) {
-    $ActionMapping = @{
-        "Get" = @("list","show","ls","get")
-        "New" = @("new","add","create")
-        "Initialize" = @("init","initialize")
-        "Remove" = @("delete","del","remove","rm")
-    }
-
-    foreach ($key in $ActionMapping.Keys) {
-        if ($ActionMapping[$key].Contains($Action.ToLower())) {
+    foreach ($key in $PlifyActionMapping.Keys) {
+        if ($PlifyActionMapping[$key].Contains($Action.ToLower())) {
             return $key
         }
     }
@@ -43,8 +36,13 @@ function Build-PlifyModuleName() {
         [Parameter(Mandatory=$true)] [string] $ModuleName
     )
 
-    return "Plify$($ModuleName)"
+    foreach ($key in $PlifyModuleAliases.Keys) {
+        if ($PlifyModuleAliases[$key].Contains($ModuleName)) {
+            $ModuleName = $key
+        }
+    }
 
+    return "Plify$($ModuleName)"
 }
 
 function Build-PlifyActionName() {

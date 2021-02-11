@@ -1,0 +1,12 @@
+
+### plify Repository get help
+    default help file for Repository get
+
+### Valid Action Parameters
+
+#### Examples
+    plify Repository get            - gets Repository
+
+#### Action Aliases
+    these aliases can be used instead of get:
+        show, list, ls

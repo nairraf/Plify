@@ -1,9 +1,12 @@
 
-## Config Module Help
+## Configuration Module Help
     This module is used to help configure plify. 
 
 ## Usage
-    plify config [opion] [ @{ Scope=["local"|"global"] } ]
+    plify configuration [opion] [ @{ Scope=["local"|"global"] } ]
+
+## Module Aliases
+    config, conf
 
 ## Available Actions
     Action                      Action Parameters               Description

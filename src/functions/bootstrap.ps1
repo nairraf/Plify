@@ -4,6 +4,18 @@ $Global:plifyDevRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
 $Global:plifyRoot = (Get-Item $PSScriptRoot).Parent.FullName
 $Global:plifyModuleRoot = "$plifyRoot$($ds)modules"
 
+$Global:PlifyModuleAliases = @{
+    "Configuration" = @("config","configuration", "conf")
+    "Repository"     = @("repo","repository")
+}
+
+$Global:PlifyActionMapping = @{
+    "Get" = @("list","show","ls","get")
+    "New" = @("new","add","create")
+    "Initialize" = @("init","initialize")
+    "Remove" = @("delete","del","remove","rm")
+}
+
 <#
 .SYNOPSIS
 Main function to import all the required Plify functions
@@ -33,5 +45,5 @@ Invoke-PlifyBootstrap
 function Invoke-PlifyBootstrap() { 
     Import-PlifyFunctions
     Set-PlifyModuleRoots
-    PlifyConfig\Initialize-PlifyConfig -Scope "Global"
+    PlifyConfiguration\Initialize-PlifyConfiguration -Scope "Global"
 }
