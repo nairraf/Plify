@@ -22,7 +22,7 @@ $DefaultModuleHelpContents = @'
     Default Help for __MODULENAME__
 
 ## Usage
-    plify __MODULENAME__ get
+    plify __MODULENAME__ <action> @{ ActionParamater="SomeValue" }
 
 ## Available Actions
     Action                      Action Parameters               Description
