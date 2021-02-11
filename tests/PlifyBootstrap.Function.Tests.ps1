@@ -15,7 +15,7 @@ Describe 'Invoke-PlifyBootstrap' {
 
     it 'Plify Functions should not exist in Global Scope Yet' {
         # boot strap contains two plify functions, so only those should exist at this point
-        (Get-Item -Path Function:\*Plify*).Count | Should -Be 2
+        (Get-Item -Path Function:\*Plify*).Count | Should -Be 3
     }
 
     it 'Plify Functions should now exist in Global Scope' {
@@ -24,5 +24,13 @@ Describe 'Invoke-PlifyBootstrap' {
 
         # we should now have more than the default 2 functions, meaning we have successfully imported the Plify functions
         (Get-Item -Path Function:\*Plify*).Count | Should -BeGreaterThan 2
+
+        # make sure we have our globals
+        $ds | Should -be -not $null
+        $plifyDevRoot | Should -be -not $null
+        $plifyRoot | Should -be -not $null
+        $plifyModuleRoot  | Should -be -not $null
+        $PlifyModuleAliases | Should -be -not $null
+        $PlifyActionMapping | Should -be -not $null
     }
 }

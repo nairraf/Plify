@@ -1,19 +1,22 @@
-# Global Variables
-$Global:ds = ([system.io.path]::DirectorySeparatorChar)
-$Global:plifyDevRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
-$Global:plifyRoot = (Get-Item $PSScriptRoot).Parent.FullName
-$Global:plifyModuleRoot = "$plifyRoot$($ds)modules"
 
-$Global:PlifyModuleAliases = @{
-    "Configuration" = @("config", "conf")
-    "Repository"     = @("repo")
-}
-
-$Global:PlifyActionMapping = @{
-    "Get" = @("list","show","ls","get")
-    "New" = @("new","add","create")
-    "Initialize" = @("init","initialize")
-    "Remove" = @("delete","del","remove","rm")
+function Initialize-PlifyGlobals() {
+    # Global Variables
+    $Global:ds = ([system.io.path]::DirectorySeparatorChar)
+    $Global:plifyDevRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
+    $Global:plifyRoot = (Get-Item $PSScriptRoot).Parent.FullName
+    $Global:plifyModuleRoot = "$plifyRoot$($ds)modules"
+    
+    $Global:PlifyModuleAliases = @{
+        "Configuration" = @("config", "conf")
+        "Repository"     = @("repo")
+    }
+    
+    $Global:PlifyActionMapping = @{
+        "Get" = @("list","show","ls","get")
+        "New" = @("new","add","create")
+        "Initialize" = @("init","initialize")
+        "Remove" = @("delete","del","remove","rm")
+    }
 }
 
 <#
@@ -43,6 +46,7 @@ Main BootStrap Function to bootstrap plify
 Invoke-PlifyBootstrap
 #>
 function Invoke-PlifyBootstrap() { 
+    Initialize-PlifyGlobals
     Import-PlifyFunctions
     Set-PlifyModuleRoots
     PlifyConfiguration\Initialize-PlifyConfiguration -Scope "Global"
