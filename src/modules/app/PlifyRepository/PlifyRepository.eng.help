@@ -3,7 +3,7 @@
     Default Help for Repository
 
 ## Usage
-    plify Repository get
+    plify Repository <action>
 
 ## Available Actions
     Action                      Action Parameters               Description

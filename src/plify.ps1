@@ -92,4 +92,5 @@ try {
     }
 } catch {
     Write-Error -Message "Error Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
+    $error
 }

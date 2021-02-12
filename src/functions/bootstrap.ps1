@@ -45,7 +45,8 @@ Main BootStrap Function to bootstrap plify
 . functions\bootsrap.ps1
 Invoke-PlifyBootstrap
 #>
-function Invoke-PlifyBootstrap() { 
+function Invoke-PlifyBootstrap() {
+    $error.Clear()
     Initialize-PlifyGlobals
     Import-PlifyFunctions
     Set-PlifyModuleRoots
