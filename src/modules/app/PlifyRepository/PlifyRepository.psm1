@@ -12,7 +12,7 @@ function Get-PlifyRepository() {
         Rows = @()
     }
 
-    foreach ($repo in $repos.Repositories.Keys) {
+    foreach ($repo in ($repos.Repositories.Keys | Sort-Object)) {
         $TableData.Rows += , ( $repo, $repos.Repositories.$repo.enabled, $repos.Repositories.$repo.name)
     }
 
