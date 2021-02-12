@@ -16,5 +16,5 @@ function Get-PlifyRepository() {
         $TableData.Rows += , ( $repo, $repos.Repositories.$repo.enabled, $repos.Repositories.$repo.name)
     }
 
-    Write-PlifyConsole -TableData $TableData
+    Write-PlifyConsole -TableData $TableData 
 }
