@@ -7,14 +7,15 @@ foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Recurse)) {
 function Get-PlifyRepository() {
     $repos = PlifyConfiguration\Get-PlifyConfiguration -Scope "Global" -RootElement "Repositories"
 
-    $TableData = @{
-        Headers = @("Repository","Enabled","Description")
-        Rows = @()
-    }
+    $Repositories = @()
 
     foreach ($repo in ($repos.Repositories.Keys | Sort-Object)) {
-        $TableData.Rows += , ( $repo, $repos.Repositories.$repo.enabled, $repos.Repositories.$repo.name)
+        $Repositories += [PSCustomObject]@{
+            Name = $repo
+            Enabled = $repos.Repositories.$repo.enabled
+            Description = $repos.Repositories.$repo.name
+        }
     }
 
-    Write-PlifyConsole -TableData $TableData 
+    return $Repositories
 }

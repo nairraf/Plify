@@ -1,9 +1,10 @@
 
 ## Repository module help
-    Default Help for Repository
+    Manages Plify's repository configuration
 
 ## Usage
     plify Repository <action>
 
 ## Available Actions
     Action                      Action Parameters               Description
+    Get                                                         Get the current list of repositories

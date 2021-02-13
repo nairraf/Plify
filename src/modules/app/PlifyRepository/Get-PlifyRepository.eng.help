@@ -5,7 +5,7 @@
 ### Valid Action Parameters
 
 #### Examples
-    plify Repository get            - gets Repository
+    plify Repository get            - displays Repository list
 
 #### Action Aliases
     these aliases can be used instead of get:
