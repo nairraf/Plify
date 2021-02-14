@@ -102,6 +102,9 @@ function Write-PlifyConsoleHelpText() {
         if ($line.Contains("__INITIALIZEALIASES__")) {
             $line = $line.Replace("__INITIALIZEALIASES__",( $PlifyActionMapping["Initialize"] -Join "," ) )
         }
+        if ($line.Contains("__UPDATEALIASES__")) {
+            $line = $line.Replace("__UPDATEEALIASES__",( $PlifyActionMapping["Update"] -Join "," ) )
+        }
 
         [Console]::ForegroundColor = $lineColor
         Write-Output  "$line"

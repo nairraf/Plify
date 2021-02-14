@@ -21,6 +21,10 @@ Describe 'Get-PlifyVerb Returns Proper Verb' {
         @{ Name = 'delete'; Expected = 'Remove' }
         @{ Name = 'init'; Expected = 'Initialize' }
         @{ Name = 'initialize'; Expected = 'Initialize' }
+        @{ Name = 'Update'; Expected = 'Update' }
+        @{ Name = 'modify'; Expected = 'Update' }
+        @{ Name = 'mod'; Expected = 'Update' }
+        @{ Name = 'upd'; Expected = 'Update' }
     ) {
         param ($Name, $Expected)
 
