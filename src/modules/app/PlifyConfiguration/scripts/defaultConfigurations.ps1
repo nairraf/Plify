@@ -3,12 +3,12 @@ $defaultPlifyConfigGlobal = @{
         'PlifyDev' = @{
             url='devrepo.plify.xyz'
             enabled=$false
-            name='Official Dev Plify Repository'
+            description='Official Dev Plify Repository'
         }
         'PlifyProd' = @{
             url='repo.plify.xyz'
             enabled=$true
-            name='Official Production Plify Repository'
+            description='Official Production Plify Repository'
         }
     }
 }

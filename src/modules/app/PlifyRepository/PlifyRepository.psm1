@@ -21,3 +21,25 @@ function Get-PlifyRepository() {
 
     return $Repositories
 }
+
+function New-PlifyRepository() {
+    param(
+        [Parameter(Mandatory=$true)] [string] $Name,
+        [Parameter(Mandatory=$false)] [bool] $Enabled = $false,
+        [Parameter(Mandatory=$false)] [string] $Description = "",
+        [Parameter(Mandatory=$false)] [string] $URL = ""
+    )
+
+    $repos = PlifyConfiguration\Get-PlifyConfiguration -Scope "Global" -RootElement "Repositories"
+    if ( -not ($repos.Repositories.Keys -contains $Name)) {
+        $repos.Repositories[$Name] = @{
+            enabled = $Enabled
+            description = $Description
+            url = $URL
+        }
+
+        PlifyConfiguration\Set-PlifyGlobalConfig -Config $repos -RootElement "Repositories"
+
+        Write-Output "Added New Plify Repository: $Name"
+    }
+}
