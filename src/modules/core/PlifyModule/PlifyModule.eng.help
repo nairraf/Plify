@@ -8,7 +8,8 @@
     plify module create @{ Name="MyModuleName"; ModuleType="App" }
 
 ## Available Actions
-    Action                      Action Parameters               Description
-    create                      Name,ModuleType                 Creates a new module with the 
-    new                                                         passed Name and ModuleType
+    Action      Action Parameters               Description
+    ------      -----------------               -----------
+    create      Name,ModuleType                 Creates a new module with the 
+    new                                         passed Name and ModuleType
     add

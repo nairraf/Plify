@@ -25,7 +25,8 @@ $DefaultModuleHelpContents = @'
     plify __MODULENAME__ <action> @{ ActionParamater="SomeValue" }
 
 ## Available Actions
-    Action                      Action Parameters               Description
+    Action      Action Parameters               Description
+    ------      -----------------               -----------
 '@
 
 $DefaultModuleActionHelpContents = @'

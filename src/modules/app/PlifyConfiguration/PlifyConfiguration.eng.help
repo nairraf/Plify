@@ -9,11 +9,12 @@
     config, conf
 
 ## Available Actions
-    Action                      Action Parameters               Description
-    init                        Scope                           initilizes the Plify Configuration directory
+    Action      Action Parameters               Description
+    ------      -----------------               -----------
+    init        Scope                           initilizes the Plify Configuration directory
     initialize                                                  depending on scope
 
-    get                         Scope                            Display the entire configuration depending on Scope
+    get         Scope                            Display the entire configuration depending on Scope
     show
     ls
     list

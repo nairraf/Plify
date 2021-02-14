@@ -6,7 +6,8 @@
     plify Repository <action>
 
 ## Available Actions
-    Action                      Action Parameters               Description
-    Get                         Name                            Get the current list of repositories
-    New                         Name,Enabled,Description,URL    Adds a new plify repository
-    Remove                      Name                            Removes a plify Repository
+    Action      Action Parameters               Description
+    ------      -----------------               -----------
+    Get         Name                            Get the current list of repositories
+    New         Name,Enabled,Description,URL    Adds a new plify repository
+    Remove      Name                            Removes a plify Repository
