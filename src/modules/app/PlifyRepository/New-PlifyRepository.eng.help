@@ -1,18 +1,18 @@
 
 ### plify Repository new help
-    default help file for Repository New
+    Adds a new Plify Repository to the repository list
 
 ### Valid Action Parameters
     Name = ""               - Required. The name of the Repository
-    Enabled = $true|$false  - Optional. The state of the Repository
+    Enabled = $true|$false  - Optional. The state of the Repository. Default is $false
     Description = ""        - Optional. Repository Description
     URL = ""                - Optional. Reposiroty URL
 
 #### Examples
-    plify Repository new @{ Name = "My Custom Repo" }           - adds a new Plify Repository
+    plify repo new @{ Name = "My Custom Repo" }           - adds a new Plify Repository
 
-    plify Repository new @{                                     - adds a plify repo with all 
-        Name = "My Custom Repo 2"                                 parameters specified
+    plify repo new @{                                     - adds a plify repo with all 
+        Name = "My Custom Repo 2"                           parameters specified
         Enabled = $true
         Description = "My Second Custom Repo"
         URL = "https://cutomrepo.some.where" }           

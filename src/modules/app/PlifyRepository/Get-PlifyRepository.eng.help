@@ -1,8 +1,12 @@
 
 ### plify Repository get help
-    default help file for Repository get
+    retreives the list of plify repositories
 
 ### Valid Action Parameters
+    Name                            - optional. The name of the plify
+                                      repository to retrieve. You can 
+                                      use the '*' character to match
+                                      wildcard patterns
 
 #### Examples
     plify Repository get            - displays Repository list

@@ -1,0 +1,18 @@
+
+### plify Repository get help
+    Removes a plify Repository from the repository list
+
+### Valid Action Parameters
+    Name = ""                       - Required. The name of the plify 
+                                      repository to remove. You can 
+                                      use the '*' character to match
+                                      wildcard patterns
+                                      
+#### Examples
+    plify Repository rm @{ Name = "RepoName"}    - removes the repository: RepoName
+    plify Repository rm @{ Name = "My*"}         - removes all repositories starting
+                                                   with "My"
+
+#### Action Aliases
+    these aliases can be used instead of remove:
+        del, rm, delete
