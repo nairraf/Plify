@@ -100,4 +100,29 @@ Describe 'PlifyRepository Management' {
         ($repos | Where-Object { $_.name -eq "PlifyProd"}).Count | Should -Be 1
         ($repos | Where-Object { $_.name -eq "PlifyDev"}).Count | Should -Be 1
     }
+
+    it 'Update-PlifyRepository Should update a specific repo' {
+        # the dev repo should not be enabled by default
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Enabled | Should -Be $false
+
+        # enable it and test
+        PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -Enabled $true
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Enabled | Should -Be $true
+
+         # disable it and test
+         PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -Enabled $false
+         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Enabled | Should -Be $false
+
+        # change the description and test
+        PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -Description "Test Description"
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Description | Should -Be "Test Description"
+
+        # change the URL and test
+        PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -URL "https://Test.URL"
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").URL | Should -Be "https://Test.URL"
+    }
+
+    it 'Update-PlifyRepository Should not update anything with a bad repo name' {
+        
+    }
 }

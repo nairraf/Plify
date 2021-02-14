@@ -80,3 +80,46 @@ function Remove-PlifyRepository() {
         Write-Output "Removed Plify Repository: $Name"
     }
 }
+
+function Update-PlifyRepository() {
+    param (
+        [Parameter(Mandatory=$true)] [string] $Name,
+        [Parameter(Mandatory=$false)] [string] $Enabled = $null,
+        [Parameter(Mandatory=$false)] [string] $NewName = $null,
+        [Parameter(Mandatory=$false)] [string] $Description = $null,
+        [Parameter(Mandatory=$false)] [string] $URL = $null
+    )
+
+    $repos = PlifyConfiguration\Get-PlifyConfiguration -Scope "Global" -RootElement "Repositories"
+    if ($repos.Repositories.Keys -like $Name) {
+        $updated = $false
+        # we use a string for Enabled as we need to test if it's set or not
+        # bool not set will always = false so we can't be sure if that was requested or just the default
+        if ([string]::IsNullOrEmpty($Enabled) -eq $false) {
+            if ($Enabled.tolower().StartsWith("t") -or $Enabled.StartsWith("1")) {
+                $repos.Repositories[$Name].Enabled = $true
+            }
+            if ($Enabled.tolower().StartsWith("f") -or $Enabled.StartsWith("0")) {
+                $repos.Repositories[$Name].Enabled = $false
+            }
+            $updated = $true
+        }
+        if ([string]::IsNullOrEmpty($Description) -eq $false) {
+            $repos.Repositories[$Name].Description = $Description
+            $updated = $true
+        }
+        if ([string]::IsNullOrEmpty($URL) -eq $false) {
+            $repos.Repositories[$Name].URL = $URL
+            $updated = $true
+        }
+        if ($updated) {
+            PlifyConfiguration\Set-PlifyGlobalConfig -Config $repos -RootElement "Repositories"
+            Write-Output ""
+            Write-Output "Updated Repository: $Name"
+            PlifyRepository\Get-PlifyRepository -Name $Name
+        }
+    }
+
+
+
+}
