@@ -1,0 +1,29 @@
+
+### plify Repository update help
+    Updates/Renames a specific Plify Repository
+
+### Valid Action Parameters
+    Name = ""                       - Required. The name of the plify
+                                      repository to update
+    
+    Enabled = $true|$false          - Optional. Enables ($true) or
+                                      Disagles ($false) the repository
+
+    Description = ""                - Optional. updates the description 
+                                      of the repository
+
+    URL = ""                        - Optional. Update the URL of the 
+                                      repository
+
+    NewName = ""                    - Optonal. The new name for the repository.
+                                      used to rename the repository
+
+#### Examples
+    plify Repository Update @{      - updates the specified PlifyRepository
+        Name = "RepoName"             with the updated settings (disables the repo)
+        Enabled = $false
+    }            
+
+#### Action Aliases
+    these aliases can be used instead of update:
+        __UPDATEALIASES__

@@ -120,9 +120,23 @@ Describe 'PlifyRepository Management' {
         # change the URL and test
         PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -URL "https://Test.URL"
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").URL | Should -Be "https://Test.URL"
-    }
 
-    it 'Update-PlifyRepository Should not update anything with a bad repo name' {
-        
+        # change the repo name and test
+        PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -NewName "PlifyTest"
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyTest").Name | Should -Be "PlifyTest"
+
+        # change everything
+        $options = @{
+            Name = "PlifyTest"
+            NewName = "PlifyDev"
+            Enabled = $false
+            Description = "Official Dev Plify Repository"
+            URL = "https://devrepo.plify.xyz"
+        }
+        PlifyRepository\Update-PlifyRepository @options
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Name | Should -Be "PlifyDev"
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Enabled | Should -Be $false
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Description | Should -Be "Official Dev Plify Repository"
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").URL | Should -Be "https://devrepo.plify.xyz"
     }
 }

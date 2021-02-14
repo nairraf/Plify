@@ -68,6 +68,9 @@ function Remove-PlifyRepository() {
 
     $repos = PlifyConfiguration\Get-PlifyConfiguration -Scope "Global" -RootElement "Repositories"
     if ($repos.Repositories.Keys -like $Name) {
+        # we can't modify the hashtable we are looping (like calling Remove() )
+        # so build a new hastable, and copy over the items that shouldn't be deleted
+        # then save using the new hashtable
         $newRepos = @{ Repositories = @{} }
         foreach ($repo in $repos.Repositories.Keys) {
             if ( -not ($repo -like $Name)) {
@@ -110,6 +113,12 @@ function Update-PlifyRepository() {
         }
         if ([string]::IsNullOrEmpty($URL) -eq $false) {
             $repos.Repositories[$Name].URL = $URL
+            $updated = $true
+        }
+        if ([string]::IsNullOrEmpty($NewName) -eq $false) {
+            $repos.Repositories[$NewName] = $repos.Repositories[$Name]
+            $repos.Repositories.Remove($Name)
+            $Name = $NewName
             $updated = $true
         }
         if ($updated) {
