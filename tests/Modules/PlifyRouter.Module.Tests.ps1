@@ -1,6 +1,6 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
 BeforeAll {
-    . $PSSCriptRoot\beforeAll.ps1
+    . $PSSCriptRoot\..\beforeAll.ps1
 
     Get-Module -Name PlifyTestModule | Remove-Module
     New-Module -Name PlifyTestModule -ScriptBlock {

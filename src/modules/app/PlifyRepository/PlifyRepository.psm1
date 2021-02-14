@@ -11,9 +11,11 @@ function Get-PlifyRepository() {
 
     foreach ($repo in ($repos.Repositories.Keys | Sort-Object)) {
         $Repositories += [PSCustomObject]@{
+            PSTypeName = "Plify.Repository"
             Name = $repo
             Enabled = $repos.Repositories.$repo.enabled
             Description = $repos.Repositories.$repo.name
+            URL = $repos.Repositories.$repo.url
         }
     }
 

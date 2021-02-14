@@ -12,7 +12,7 @@ function Get-__FULLMODULENAME__() {
 $DefaultModuleTestContents = @'
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
 BeforeAll {
-    . $PSSCriptRoot\beforeAll.ps1
+    . $PSSCriptRoot\..\beforeAll.ps1
 }
 '@
 
@@ -90,7 +90,7 @@ function New-PlifyModule() {
     }
 
     # make sure the default module test file doesn't exist and create it
-    $defaultModuleTestFile = "$plifyDevRoot$($ds)tests$($ds)$Name.Module.Tests.ps1"
+    $defaultModuleTestFile = "$plifyDevRoot$($ds)tests$($ds)Modules$($ds)$Name.Module.Tests.ps1"
     if (-not (Test-Path -Path $defaultModuleTestFile)) {
         Write-Output "Creating Default Module Test File: $defaultModuleTestFile"
         $DefaultModuleTestContents | Out-File -FilePath $defaultModuleTestFile

@@ -50,5 +50,6 @@ function Invoke-PlifyBootstrap() {
     Initialize-PlifyGlobals
     Import-PlifyFunctions
     Set-PlifyModuleRoots
+    Update-PlifyFormatData
     PlifyConfiguration\Initialize-PlifyConfiguration -Scope "Global"
 }

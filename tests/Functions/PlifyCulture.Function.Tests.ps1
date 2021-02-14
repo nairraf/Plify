@@ -1,6 +1,6 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
 BeforeAll {
-    . $PSSCriptRoot\beforeAll.ps1
+    . $PSSCriptRoot\..\beforeAll.ps1
 }
 
 Describe 'Get-PlifyTranslation' {

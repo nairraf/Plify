@@ -10,7 +10,7 @@ Describe 'Invoke-PlifyBootstrap' {
 
         # we set CallInvoke to false as we want to test that specifically
         # if CallInvoke is true, beforeAll.Funcion.ps1 will auto call Invoke-PlifyBootstrap for us, which we don't want for these tests
-        . $PSSCriptRoot\beforeAll.ps1 -CallInvoke $false
+        . $PSSCriptRoot\..\beforeAll.ps1 -CallInvoke $false
     }
 
     it 'Plify Functions should not exist in Global Scope Yet' {

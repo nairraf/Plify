@@ -26,6 +26,7 @@ if ($Flush) {
     Write-Debug "Re-Bootstrapping Plify functions and modules"
     . $bootStrapScript
     Invoke-PlifyBootstrap
+    Update-FormatData
 }
 
 # test if we have a verbose or debug flag and pass it on so modules can use them

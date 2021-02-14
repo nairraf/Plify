@@ -1,6 +1,6 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
 BeforeAll {
-    . $PSSCriptRoot\beforeAll.ps1
+    . $PSSCriptRoot\..\beforeAll.ps1
 }
 
 Describe 'New-PlifyModule' {
@@ -10,8 +10,8 @@ Describe 'New-PlifyModule' {
                 Remove-Item "$plifyModuleRoot$($ds)Pester" -Recurse -Force | Out-Null
             }
 
-            if (Test-Path -Path "$plifyDevRoot$($ds)tests$($ds)PlifyPesterTest.Module.Tests.ps1") {
-                Remove-Item "$plifyDevRoot$($ds)tests$($ds)PlifyPesterTest.Module.Tests.ps1" -Force | Out-Null
+            if (Test-Path -Path "$plifyDevRoot$($ds)tests$($ds)Modules$($ds)PlifyPesterTest.Module.Tests.ps1") {
+                Remove-Item "$plifyDevRoot$($ds)tests$($ds)Modules$($ds)PlifyPesterTest.Module.Tests.ps1" -Force | Out-Null
             }
         }
     }
@@ -31,7 +31,7 @@ Describe 'New-PlifyModule' {
         Test-Path -Path "$plifyModuleRoot$($ds)Pester$($ds)PlifyPesterTest$($ds)PlifyPesterTest.psm1" | Should -Be $true
         Test-Path -Path "$plifyModuleRoot$($ds)Pester$($ds)PlifyPesterTest$($ds)PlifyPesterTest.eng.help" | Should -Be $true
         Test-Path -Path "$plifyModuleRoot$($ds)Pester$($ds)PlifyPesterTest$($ds)Get-PlifyPesterTest.eng.help" | Should -Be $true
-        Test-Path -Path "$plifyDevRoot$($ds)tests$($ds)PlifyPesterTest.Module.Tests.ps1" | Should -Be $true
+        Test-Path -Path "$plifyDevRoot$($ds)tests$($ds)Modules$($ds)PlifyPesterTest.Module.Tests.ps1" | Should -Be $true
     }
 
 }

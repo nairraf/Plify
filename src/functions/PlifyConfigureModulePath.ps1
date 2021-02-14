@@ -12,6 +12,7 @@ function Global:Set-PlifyModuleRoots() {
 
     foreach ($PlifyPath in $PlifyModuleRoots.FullName) {
         if ( -not ($env:PSModulePath).ToLower().Contains($PlifyPath.ToLower()) ) {
+            Write-Debug "Adding to PSModulePath: $PlifyPath"
             $env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + $PlifyPath
         }
     }
