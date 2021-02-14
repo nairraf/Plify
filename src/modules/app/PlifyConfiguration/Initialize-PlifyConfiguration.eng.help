@@ -20,4 +20,4 @@
 
 #### Action Aliases
     these aliases can be used instead of Initialize:
-        init
+        __INITIALIZEALIASES__

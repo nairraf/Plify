@@ -41,7 +41,7 @@ $DefaultModuleActionHelpContents = @'
 
 #### Action Aliases
     these aliases can be used instead of get:
-        show, list, ls
+        __GETALIASES__
 '@
 
 

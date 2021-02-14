@@ -90,6 +90,18 @@ function Write-PlifyConsoleHelpText() {
             $line = $line.Replace('#','').Trim()
             $lineColor = "Green"
         }
+        if ($line.Contains("__REMOVEALIASES__")) {
+            $line = $line.Replace("__REMOVEALIASES__", ( $PlifyActionMapping["Remove"] -Join "," ) )
+        }
+        if ($line.Contains("__GETALIASES__")) {
+            $line = $line.Replace("__GETALIASES__", ( $PlifyActionMapping["Get"] -Join "," ) )
+        }
+        if ($line.Contains("__NEWALIASES__")) {
+            $line = $line.Replace("__NEWALIASES__",( $PlifyActionMapping["New"] -Join "," ) )
+        }
+        if ($line.Contains("__INITIALIZEALIASES__")) {
+            $line = $line.Replace("__INITIALIZEALIASES__",( $PlifyActionMapping["Initialize"] -Join "," ) )
+        }
 
         [Console]::ForegroundColor = $lineColor
         Write-Output  "$line"

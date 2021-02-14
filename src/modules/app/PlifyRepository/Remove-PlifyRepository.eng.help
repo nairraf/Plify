@@ -1,5 +1,5 @@
 
-### plify Repository get help
+### plify Repository remove help
     Removes a plify Repository from the repository list
 
 ### Valid Action Parameters
@@ -15,4 +15,4 @@
 
 #### Action Aliases
     these aliases can be used instead of remove:
-        del, rm, delete
+        __REMOVEALIASES__

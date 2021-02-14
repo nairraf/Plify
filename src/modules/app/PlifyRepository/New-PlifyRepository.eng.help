@@ -19,4 +19,4 @@
 
 #### Action Aliases
     these aliases can be used instead of new:
-        add, create
+        __NEWALIASES__
