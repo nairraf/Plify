@@ -6,7 +6,8 @@
     Name                            - optional. The name of the plify
                                       repository to retrieve. You can 
                                       use the '*' character to match
-                                      wildcard patterns
+                                      wildcard patterns. If omitted
+                                      all repositories are retrieved.
 
 #### Examples
     plify Repository get            - displays Repository list

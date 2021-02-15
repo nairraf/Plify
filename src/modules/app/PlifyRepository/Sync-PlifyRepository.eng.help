@@ -1,0 +1,21 @@
+
+### plify Repository sync help
+    synchronizes the repository index. used for searching and retrieving
+    Plify image packages.
+
+### Valid Action Parameters
+    Name                            - optional. The name of the plify
+                                      repository to retrieve the indexes
+                                      for. You can use the '*' character 
+                                      to match wildcard patterns. 
+                                      If omitted all repository indesxes 
+                                      are retrieved/refreshed.
+
+#### Examples
+    plify Repository sync            - sychonizes all repository indexes
+    plify Repository sync @{         - sychonizes the repository index
+        Name = "My Repo" }             for the "My Repo" repository
+
+#### Action Aliases
+    these aliases can be used instead of get:
+        __SYNCALIASES__

@@ -17,6 +17,7 @@ function Initialize-PlifyGlobals() {
         "Initialize" = @("init","initialize")
         "Remove" = @("delete","del","remove","rm")
         "Update" = @("update","modify","mod","upd")
+        "Sync" = @("sync","synchronize","pull")
     }
 }
 

@@ -128,7 +128,9 @@ function Update-PlifyRepository() {
             PlifyRepository\Get-PlifyRepository -Name $Name
         }
     }
+}
 
-
-
+function Sync-PlifyRepository() {
+    # download the repository index and cache it locally
+    # used when searching for images locally
 }

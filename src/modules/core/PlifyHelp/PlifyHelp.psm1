@@ -105,6 +105,9 @@ function Write-PlifyConsoleHelpText() {
         if ($line.Contains("__UPDATEALIASES__")) {
             $line = $line.Replace("__UPDATEALIASES__",( $PlifyActionMapping["Update"] -Join "," ) )
         }
+        if ($line.Contains("__SYNCALIASES__")) {
+            $line = $line.Replace("__SYNCALIASES__",( $PlifyActionMapping["Sync"] -Join "," ) )
+        }
 
         [Console]::ForegroundColor = $lineColor
         Write-Output  "$line"
