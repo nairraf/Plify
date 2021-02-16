@@ -2,6 +2,7 @@ TestExplorerResults.xml
 .vscode
 coverage.xml
 *.xmind
-repository\images\*.vhd*
-repository\root\*.yml
-repository\root\*.7z
+repository/images/*.vhd*
+repository/images/*.yml
+repository/root/*.yml
+repository/root/*.7z
