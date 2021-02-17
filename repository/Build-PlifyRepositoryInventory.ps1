@@ -15,10 +15,7 @@ param(
 ## Main
 $error.Clear()
 
-$Repository = @{
-    PlifyRepo = @{ Version = 1.0 }
-    Repository = @{}
-}
+$Repository = @{}
 
 $ds = [System.IO.Path]::DirectorySeparatorChar
 $RepoRoot = "$PSScriptRoot$($ds)root"
@@ -53,13 +50,13 @@ foreach ($image in (Get-ChildItem -Path "$ImageRoot$($ds)*.vhd*" -Recurse)) {
         $imageHash = ""
         $packageHash = ""
 
-        if ($lastChangeHash -eq $oldInventory.Repository.$packageName.image.lastChange -and $Force -eq $false) {
-            if(-not ([string]::IsNullOrEmpty($oldInventory.Repository.$packageName.image.hash)) -and 
-                -not ([string]::IsNullOrEmpty($oldInventory.Repository.$packageName.package.hash))) {
+        if ($lastChangeHash -eq $oldInventory.$packageName.image.lastChange -and $Force -eq $false) {
+            if(-not ([string]::IsNullOrEmpty($oldInventory.$packageName.image.hash)) -and 
+                -not ([string]::IsNullOrEmpty($oldInventory.$packageName.package.hash))) {
                     Write-Output "  No change deteted for image: $image"
                     Write-Output "      will not re-compute hashes, use '-Force' to recompute hashes"
-                    $imageHash = $oldInventory.Repository.$packageName.image.hash
-                    $packageHash = $oldInventory.Repository.$packageName.package.hash
+                    $imageHash = $oldInventory.$packageName.image.hash
+                    $packageHash = $oldInventory.$packageName.package.hash
                 }
         }
 
@@ -70,15 +67,15 @@ foreach ($image in (Get-ChildItem -Path "$ImageRoot$($ds)*.vhd*" -Recurse)) {
 
         try {
             $imgYaml = ConvertFrom-Yaml -Yaml (Get-Content -Path $yaml -Raw)
-            $Repository.Repository[$packageName] = @{
+            $Repository[$packageName] = @{
                 Virtualization = $imgYaml.Virtualization
                 os = $imgYaml.os
                 image = $imgYaml.image
             }
-            $Repository.Repository[$packageName]["package"] = @{}
-            $Repository.Repository[$packageName]["image"]["lastChange"] = $lastChangeHash
-            $Repository.Repository[$packageName]["image"]["hash"] = $imageHash
-            $packageRelativePath = $Repository.Repository[$packageName]["os"]["family"] + $ds + $Repository.Repository[$packageName]["os"]["name"]
+            $Repository[$packageName]["package"] = @{}
+            $Repository[$packageName]["image"]["lastChange"] = $lastChangeHash
+            $Repository[$packageName]["image"]["hash"] = $imageHash
+            $packageRelativePath = $Repository[$packageName]["os"]["family"] + $ds + $Repository[$packageName]["os"]["name"]
             $packagePath = $RepoRoot + $ds + $packageRelativePath
             $packageFullName = $packagePath + $ds + $packageName
             if ( -not (Test-Path -Path $packagePath )) {
@@ -95,8 +92,8 @@ foreach ($image in (Get-ChildItem -Path "$ImageRoot$($ds)*.vhd*" -Recurse)) {
                     $packageHash = (Get-FileHash -Algorithm SHA256 -Path $packageFullName).Hash
                 }
             }
-            $Repository.Repository[$packageName]["package"]["hash"] = $packageHash
-            $Repository.Repository[$packageName]["package"]["relative_repo_path"] = $packageRelativePath.Replace($ds,'/') + '/' + $packageName
+            $Repository[$packageName]["package"]["hash"] = $packageHash
+            $Repository[$packageName]["package"]["relative_repo_path"] = $packageRelativePath.Replace($ds,'/') + '/' + $packageName
         } catch {
             Write-Error "Error Processing: $image"
             $error
