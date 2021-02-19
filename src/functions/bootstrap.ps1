@@ -19,6 +19,11 @@ function Initialize-PlifyGlobals() {
         "Update" = @("update","modify","mod","upd")
         "Sync" = @("sync","synchronize","pull")
     }
+
+    $Global:PlifyShortcuts = @{
+        "repolist" = @{Module="PlifyRepository"; Action="Get-PlifyRepository"}
+        "r.l" = @{Module="PlifyRepository"; Action="Get-PlifyRepository"}
+    }
 }
 
 <#
