@@ -12,6 +12,8 @@ Describe 'PlifyRepository Management' {
         if (Test-Path -Path "$globalPlifyConfigDir") { Remove-Item -Path $globalPlifyConfigDir -Recurse -Force }
         Mock Get-PlifyConfigurationDir { return $localPlifyConfigDir } -ParameterFilter { $Scope -eq 'local' } -ModuleName PlifyConfiguration
         Mock Get-PlifyConfigurationDir { return $globalPlifyConfigDir } -ParameterFilter { $Scope -eq 'Global' } -ModuleName PlifyConfiguration
+        Import-Module PlifyRepository
+        Mock Get-PlifyConfigurationDir { return $globalPlifyConfigDir } -ParameterFilter { $Scope -eq 'Global' } -ModuleName PlifyRepository
         Initialize-PlifyConfiguration -Scope Global
     }
 
@@ -138,5 +140,16 @@ Describe 'PlifyRepository Management' {
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Enabled | Should -Be $false
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Description | Should -Be "Official Dev Plify Repository"
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").URL | Should -Be "https://devrepo.plify.xyz"
+    }
+
+    It 'Sync-PlifyRepository should successfully sync the dev repository' {
+        # make sure the dev repo is enabled
+        PlifyRepository\Update-PlifyRepository -Name "PlifyDev" -Enabled $true
+        $repoCache = PlifyRepository\Get-PlifyRepositoryCacheFile
+        Test-Path -Path $repoCache | Should -BeFalse
+        PlifyRepository\Sync-PlifyRepository -Force
+        Test-Path -Path $repoCache | Should -BeTrue
+        $json = Get-Content -Path $repoCache -Raw | ConvertFrom-Json -Depth 5
+        $json.PlifyDev.Count | Should -BeGreaterThan 0
     }
 }
