@@ -68,4 +68,9 @@ function Get-PlifyWebLargeFile() {
             return $false
         }
     }
+
+    # we we don't have a hash to compare, then return true if the download file exists
+    if (Test-Path $FilePath) {
+        return $true
+    }
 }
