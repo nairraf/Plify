@@ -4,17 +4,16 @@
     Plify image packages.
 
 ### Valid Action Parameters
-    Name                            - optional. The name of the plify
-                                      repository to retrieve the indexes
-                                      for. You can use the '*' character 
-                                      to match wildcard patterns. 
-                                      If omitted all repository indesxes 
-                                      are retrieved/refreshed.
-
+    Force                           - Be default plify repo sync will
+                                      only synchronize the repositories
+                                      once per 24 hours. Use 'Force' to
+                                      synchronize the repositories and 
+                                      ignore the 24 hour limit.
 #### Examples
     plify Repository sync            - sychonizes all repository indexes
-    plify Repository sync @{         - sychonizes the repository index
-        Name = "My Repo" }             for the "My Repo" repository
+    plify Repository sync @{         - sychonizes the repository indexes
+        Force = $true }                even if they have already been
+                                       synchronized in the past 24 hours
 
 #### Action Aliases
     these aliases can be used instead of get:

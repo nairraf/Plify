@@ -13,4 +13,4 @@
     Remove      Name                            Removes a plify Repository
     Update      Name,Enabled,Description,URL,   Updates a specific repository configuration
                   NewName
-    Sync        Name                            Synchronizes repository indexes
+    Sync        Force                            Synchronizes repository indexes
