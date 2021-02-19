@@ -23,6 +23,10 @@
                         <Label>URL</Label>
                         <Alignment>Left</Alignment>
                     </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Thumbprint</Label>
+                        <Alignment>Left</Alignment>
+                    </TableColumnHeader>
                 </TableHeaders>
                 <TableRowEntries>
                     <TableRowEntry>
@@ -38,6 +42,9 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>URL</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Thumbprint</PropertyName>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

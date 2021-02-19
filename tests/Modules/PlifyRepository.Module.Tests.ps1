@@ -46,11 +46,17 @@ Describe 'PlifyRepository Management' {
             Enabled = $true
             Description = "Plify Test Repository"
             URL = "https://testrepo.plify.xyz"
+            Thumbprint = "1a3b3c4d"
         }
         PlifyRepository\New-PlifyRepository @options
         $repos = PlifyRepository\Get-PlifyRepository
         $repos.count | Should -Be 3
         $repos.Name | Should -Contain "Test Repository"
+        $testrepo = $repos | Where-Object { $_.Name -eq "Test Repository" }
+        $testrepo.Enabled | Should -BeTrue
+        $testrepo.Description | Should -Be "Plify Test Repository"
+        $testrepo.URL | Should -Be "https://testrepo.plify.xyz"
+        $testrepo.Thumbprint | Should -Be "1a3b3c4d"
     }
 
     It 'New-PlifyRepository Should be disabled by default' {
@@ -58,6 +64,7 @@ Describe 'PlifyRepository Management' {
             Name = "Test Repository"
             Description = "Plify Test Repository"
             URL = "https://testrepo.plify.xyz"
+            Thumbprint = "1a3b3c4d"
         }
         PlifyRepository\New-PlifyRepository @options
         $repos = PlifyRepository\Get-PlifyRepository
@@ -123,6 +130,10 @@ Describe 'PlifyRepository Management' {
         PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -URL "https://Test.URL"
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").URL | Should -Be "https://Test.URL"
 
+        # change the thumbprint and test
+        PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -Thumbprint "1a2b3c4d"
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Thumbprint | Should -Be "1a2b3c4d"
+
         # change the repo name and test
         PlifyRepository\Update-PlifyRepository -Name 'PlifyDev' -NewName "PlifyTest"
         (PlifyRepository\Get-PlifyRepository -Name "PlifyTest").Name | Should -Be "PlifyTest"
@@ -134,12 +145,14 @@ Describe 'PlifyRepository Management' {
             Enabled = $false
             Description = "Official Dev Plify Repository"
             URL = "https://devrepo.plify.xyz"
+            Thumbprint = "1a2b3c4d1a2b3c4d"
         }
         PlifyRepository\Update-PlifyRepository @options
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Name | Should -Be "PlifyDev"
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Enabled | Should -Be $false
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Description | Should -Be "Official Dev Plify Repository"
         (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").URL | Should -Be "https://devrepo.plify.xyz"
+        (PlifyRepository\Get-PlifyRepository -Name "PlifyDev").Thumbprint | Should -Be "1a2b3c4d1a2b3c4d"
     }
 
     It 'Sync-PlifyRepository should successfully sync the dev repository' {

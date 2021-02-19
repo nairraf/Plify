@@ -35,6 +35,7 @@ function Get-PlifyRepository() {
             Enabled = $repos.Repositories.$repo.enabled
             Description = $repos.Repositories.$repo.description
             URL = $repos.Repositories.$repo.url
+            Thumbprint = $repos.Repositories.$repo.thumbprint
         }
     }
 
@@ -46,7 +47,8 @@ function New-PlifyRepository() {
         [Parameter(Mandatory=$true)] [string] $Name,
         [Parameter(Mandatory=$false)] [bool] $Enabled = $false,
         [Parameter(Mandatory=$false)] [string] $Description = "",
-        [Parameter(Mandatory=$false)] [string] $URL = ""
+        [Parameter(Mandatory=$false)] [string] $URL = "",
+        [Parameter(Mandatory=$false)] [string] $Thumbprint = ""
     )
 
     $repos = PlifyConfiguration\Get-PlifyConfiguration -Scope "Global" -RootElement "Repositories"
@@ -55,6 +57,7 @@ function New-PlifyRepository() {
             enabled = $Enabled
             description = $Description
             url = $URL
+            thumbprint = $Thumbprint
         }
 
         PlifyConfiguration\Set-PlifyGlobalConfig -Config $repos -RootElement "Repositories"
@@ -92,7 +95,8 @@ function Update-PlifyRepository() {
         [Parameter(Mandatory=$false)] [string] $Enabled = $null,
         [Parameter(Mandatory=$false)] [string] $NewName = $null,
         [Parameter(Mandatory=$false)] [string] $Description = $null,
-        [Parameter(Mandatory=$false)] [string] $URL = $null
+        [Parameter(Mandatory=$false)] [string] $URL = $null,
+        [Parameter(Mandatory=$false)] [string] $Thumbprint = $null
     )
 
     $repos = PlifyConfiguration\Get-PlifyConfiguration -Scope "Global" -RootElement "Repositories"
@@ -115,6 +119,10 @@ function Update-PlifyRepository() {
         }
         if ([string]::IsNullOrEmpty($URL) -eq $false) {
             $repos.Repositories[$Name].URL = $URL
+            $updated = $true
+        }
+        if ([string]::IsNullOrEmpty($Thumbprint) -eq $false) {
+            $repos.Repositories[$Name].Thumbprint = $Thumbprint
             $updated = $true
         }
         if ([string]::IsNullOrEmpty($NewName) -eq $false) {
