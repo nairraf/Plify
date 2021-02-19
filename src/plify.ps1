@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$false, Position=0)] [string] $Module,
-    [Parameter(Mandatory=$false, Position=1)] [string] $Action,
+    [Parameter(Mandatory=$false, Position=1)] $Action, # we can't force a type here because of shortcuts. this could be string or hastable
     [Parameter(Mandatory=$false, Position=2)] [hashtable] $ActionParams = @{},
     [Parameter(Mandatory=$false)] [switch] $Help,
     [Parameter(Mandatory=$false)] [switch] $Flush
@@ -43,11 +43,15 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
     # see if we have a shortcut registered:
     $plifyShortcut = $false
     # build our plify shortcut
+    $shortcut = $Module
     if (-not [string]::IsNullOrEmpty($Action)) {
-        $shortcut = "$Module.$Action"
-    } else {
-        $shortcut = $Module
-    }
+        if ($Action.GetType().Name -eq "Hashtable") {
+            $ActionParams = $Action
+            $Action = ""
+        } else {
+            $shortcut = "$Module.$Action"
+        }
+    } 
 
     if ($Global:PlifyShortcuts.Keys -contains $shortcut) {
         $ModuleName = $Global:PlifyShortcuts.$shortcut.Module
