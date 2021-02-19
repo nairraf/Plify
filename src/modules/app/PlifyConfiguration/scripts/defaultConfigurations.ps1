@@ -1,12 +1,12 @@
 $defaultPlifyConfigGlobal = @{
     Repositories = @{ 
         'PlifyDev' = @{
-            url='devrepo.plify.xyz'
+            url='https://devrepo.plify.xyz'
             enabled=$false
             description='Official Dev Plify Repository'
         }
         'PlifyProd' = @{
-            url='repo.plify.xyz'
+            url='https://repo.plify.xyz'
             enabled=$true
             description='Official Production Plify Repository'
         }

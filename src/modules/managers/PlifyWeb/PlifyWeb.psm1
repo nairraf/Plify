@@ -6,11 +6,11 @@ foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Recurse)) {
 function Get-PlifyWebContent() {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)] [string] $Uri
+        [Parameter(Mandatory=$true)] [string] $Url
     )
 
     try {
-        $content = Invoke-WebRequest -Uri $Uri | Select-Object -ExpandProperty Content
+        $content = Invoke-WebRequest -Uri $Url | Select-Object -ExpandProperty Content
         return $content
     } catch {
         return ""

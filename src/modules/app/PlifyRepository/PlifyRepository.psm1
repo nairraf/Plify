@@ -1,3 +1,5 @@
+#Requires -Modules powershell-yaml
+
 # import all our external module functions into the modules current scope on module load
 foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Recurse)) {  
     . $file.FullName
@@ -130,7 +132,65 @@ function Update-PlifyRepository() {
     }
 }
 
+function Get-PlifyRepositoryCacheFile() {
+    return "$(PlifyConfiguration\Get-PlifyConfigurationDir -Scope "Global")$($ds)repositorycache.json"
+}
+
 function Sync-PlifyRepository() {
-    # download the repository index and cache it locally
-    # used when searching for images locally
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$false)] [switch] $Force
+    )
+
+    $cacheFile = Get-PlifyRepositoryCacheFile
+    if ( (Test-Path -Path $cacheFile) -and $Force -eq $false) {
+        $lastUpdate = (Get-Item -Path $cacheFile).LastWriteTimeUtc
+        $currentTime = Get-Date -AsUTC
+        if ($lastUpdate -gt $currentTime.AddDays(-1)) {
+            Write-Output "Cache file has already been updated within the last day, skipping"
+            Write-Output "  use: '@{Force=`$true}' to force an update now"
+            return
+        }
+    }
+
+    $EnabledRepos = Get-PlifyRepository | Where-Object { $_.Enabled -eq $true }
+    $cache = @{}
+    $start = Get-Date
+    $r = 0
+    foreach ($repo in $EnabledRepos) {
+        # the sync process is very quick that write-progress just disapears too quickly to be useful.
+        # using write-output to just display console messages for feedback
+        Write-Progress -Activity "Syncrhonizing Plify Repositories" -Status "Processing $($r+1) of $($EnabledRepos.Count)" -PercentComplete (($r)/$EnabledRepos.Count*100) -CurrentOperation "Downloading Inventory: $($repo.Name)"
+        
+        $cache[$repo.Name] = @{}
+        Write-Output "Processing Repository: $($repo.Name)  ($($repo.URL))"
+        Write-Output "  Downloading Inventory"
+        $indexContent = PlifyWeb\Get-PlifyWebContent -Url "$($repo.URL)/inventory.json"
+        Write-Progress -Activity "Syncrhonizing Plify Repositories" -Status "Processing $($r+1) of $($EnabledRepos.Count)" -PercentComplete (($r)/$EnabledRepos.Count*100) -CurrentOperation "Updating Inventory: $($repo.Name)"
+        if ( -not ([string]::IsNullOrEmpty($indexContent))) {
+            Write-Output "  Reading Inventory"
+            $index = ($indexContent | ConvertFrom-Json -Depth 5)
+            Write-Output "  Processing Inventory"
+            $p = 0
+            $numImages = ($index | Get-Member -MemberType NoteProperty).Count
+            foreach ($package in $index | Get-Member -MemberType NoteProperty){
+                # it's no use having a second write-progress as even a large repo with thousands of entries is processed very quickly
+                # and you just see a "flash" before it completes. you would have to really slow it down with start-sleep to see the progress
+                # and that just doesn't make sense.
+                Write-Progress -Activity "Processing Inventory" -Id 1 -PercentComplete (($p+1)/$numImages*100) -Status "$($repo.Name) "
+
+                $cache[$repo.Name][$package.Name] = $index.($package.Name)
+
+                $p += 1
+            }
+        }
+        Write-Progress -Activity "Processing Inventory" -Id 1 -Status "$($repo.Name)" -PercentComplete 100 -Completed
+        $r += 1
+    }
+    Write-Progress -Activity "Syncrhonizing Plify Repositories" -Status "Completed" -PercentComplete 100 -Completed
+    Write-Output "Updating Cache"
+    $cache | ConvertTo-Json -Depth 5 -Compress | Out-File -FilePath $cacheFile
+    $end = Get-Date
+    Write-Output "Complete"
+    Write-Debug " Update Process run time: $($end - $start)"
 }

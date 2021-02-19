@@ -6,3 +6,4 @@ repository/images/**/*.vhd*
 repository/images/**/*.yml
 repository/**/*.yml
 repository/root/**/*.7z
+repository/**/*.json

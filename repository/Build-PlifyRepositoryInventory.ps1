@@ -19,9 +19,9 @@ $Repository = @{}
 
 $ds = [System.IO.Path]::DirectorySeparatorChar
 $RepoRoot = "$PSScriptRoot$($ds)root"
-$inventoryFile = "$RepoRoot$($ds)inventory.yml"
+$inventoryFile = "$RepoRoot$($ds)inventory.json"
 if (Test-Path -Path $inventoryFile) {
-    $oldInventory = ConvertFrom-Yaml -Yaml (Get-Content -Path $inventoryFile -Raw)
+    $oldInventory = (Get-Content -Path $inventoryFile -Raw | ConvertFrom-Json -Depth 5)
 } else {
     $oldInventory = @{}
 }
@@ -68,7 +68,7 @@ foreach ($image in (Get-ChildItem -Path "$ImageRoot$($ds)*.vhd*" -Recurse)) {
         try {
             $imgYaml = ConvertFrom-Yaml -Yaml (Get-Content -Path $yaml -Raw)
             $Repository[$packageName] = @{
-                Virtualization = $imgYaml.Virtualization
+                virtualization = $imgYaml.virtualization
                 os = $imgYaml.os
                 image = $imgYaml.image
             }
@@ -105,7 +105,7 @@ foreach ($image in (Get-ChildItem -Path "$ImageRoot$($ds)*.vhd*" -Recurse)) {
 
 Write-Output "Writing new inventory file: $inventoryFile"
 # write our yaml repository file
-$Repository | ConvertTo-Yaml -OutFile $inventoryFile -Force
+$Repository | ConvertTo-Json -Depth 5 -Compress | Out-File -FilePath $inventoryFile -Force
 
 Write-Output "done"
 Write-Output ""

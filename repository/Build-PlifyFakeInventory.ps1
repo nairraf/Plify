@@ -4,7 +4,7 @@ param(
 )
 
 $Script:Repository = @{}
-$inventoryFile = "$PSScriptRoot$($ds)inventory.yml"
+$inventoryFile = "$PSScriptRoot$($ds)inventory.json"
 
 $Script:osDetails = @{
     linux = @(
@@ -23,9 +23,9 @@ function Get-PlifyRandomString() {
     )
 
     $randString = ""
-    for ($i=0;$i -lt $NumChars; $i++) {
-        $randString += ((65..90) + (97..122) | Get-Random -Count 1 | ForEach-Object {[char]$_})
-    }
+    $randString += ( ((48..57) + (65..90) + (97..122)) | Get-Random -Count $NumChars | ForEach-Object {[char]$_}) -join ""
+
+
     return $randString
 }
 
@@ -59,7 +59,7 @@ function Add-FakeOS() {
                 url = "www.plify.com"
                 name = "Ian Farr"
             }
-            lastChange = (Get-PlifyRandomString 30).ToString().ToUpper()
+            lastChange = (Get-PlifyRandomString 40).ToString().ToUpper()
             version = (Get-Random (1..100))
         }
         os = @{
@@ -71,7 +71,12 @@ function Add-FakeOS() {
         }
     }
 }
+Write-Output "Adding $NumFakes Fakes.."
 for ($i=0;$i -lt $NumFakes;$i++) {
+    if ($i % 100 -eq 0) {
+        write-Output "  Added $i Fakes"
+    }
     Add-FakeOS
 }
-$Repository | ConvertTo-Yaml | Out-File -FilePath $inventoryFile
+Write-Output "Writing JSON..."
+$Repository | ConvertTo-Json -Depth 5 -Compress  | Out-File -FilePath $inventoryFile
