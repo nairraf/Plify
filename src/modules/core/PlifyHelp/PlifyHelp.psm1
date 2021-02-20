@@ -103,10 +103,35 @@ function Write-PlifyConsoleHelpText() {
                 Rows = @()
             }
             foreach ($shortcut in $PlifyShortcuts.keys) {
-                $shortcutHelp.Rows += , ($shortcut, $PlifyShortcuts.$shortcut.Equivalent, $PlifyShortcuts.$shortcut.Description)
+                $targetShortcut = $shortcut
+                if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
+                       $targetShortcut = $PlifyShortcuts.$shortcut.Alias
+                }
+                $shortcutHelp.Rows += , ($shortcut, $PlifyShortcuts.$targetShortcut.Equivalent, $PlifyShortcuts.$targetShortcut.Description)
             }
             $helpTxt = Write-PlifyConsole -TableData $shortcutHelp -ReturnText $true -LeftPadding 4
             $line = $line.Replace("__PLIFYSHORTCUTS__", $helpTxt)
+        }
+        if ($line.Contains("__MODULESHORTCUTS__")) {
+            $moduleLine = $line.Split(":")
+            if ($moduleLine.Count -eq 2) {
+                $shortcutHelp = @{
+                    Headers = @("Shortcut","Equivalent Cmd","Description")
+                    Rows = @()
+                }
+                $module = $moduleLine[1]
+                foreach ($shortcut in $PlifyShortcuts.Keys) {
+                    $targetShortcut = $shortcut
+                    if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
+                        $targetShortcut = $PlifyShortcuts.$shortcut.Alias
+                    }
+                    if ($PlifyShortcuts.$targetShortcut.Module -eq $module) {
+                        $shortcutHelp.Rows += , ($shortcut, $PlifyShortcuts.$targetShortcut.Equivalent, $PlifyShortcuts.$targetShortcut.Description)
+                    }
+                }
+                $helpTxt = Write-PlifyConsole -TableData $shortcutHelp -ReturnText $true -LeftPadding 4
+                $line = $line.Replace("__MODULESHORTCUTS__:$module", $helpTxt)
+            }
         }
         if ($line.Contains("__REMOVEALIASES__")) {
             $line = $line.Replace("__REMOVEALIASES__", ( $PlifyActionMapping["Remove"] -Join "," ) )

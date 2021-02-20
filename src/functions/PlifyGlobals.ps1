@@ -18,7 +18,26 @@ $Global:PlifyActionMapping = @{
 }
 
 $Global:PlifyShortcuts = @{
-    "repolist" = @{Module="PlifyRepository"; Action="Get-PlifyRepository";Description="Lists plify repositories";Equivalent="plify repo list"}
-    "r.l" = @{Module="PlifyRepository"; Action="Get-PlifyRepository";Description="Lists plify repositories";Equivalent="plify repo list"}
-    "repo.newcert" = @{Module="PlifyRepository"; Action="New-PlifyRepositoryCertificate";Description="Creates a new repository certificate";Equivalent="N/A"}
+    "rl" = @{
+        Module="PlifyRepository"
+        Action="Get-PlifyRepository"
+        Description="Lists plify repositories"
+        Equivalent="plify repo list" 
+    }
+    "newSigningCert" = @{
+        Module="PlifyRepository"
+        Action="New-PlifyRepositoryCertificate"
+        Description="Creates a new repository signing certificate"
+        Equivalent="None. Shortcut Only" 
+    }
+    "globalConfig" = @{
+        Module="PlifyConfiguration"
+        Action="Get-PlifyConfiguration"
+        Description="Displays Global Plify Configuration"
+        Equivalent="plify config get @{Scope='Global'}"
+        ActionParams=@{Scope="Global"}
+    }
+    "gc" = @{
+        Alias="globalConfig"
+    }
 }

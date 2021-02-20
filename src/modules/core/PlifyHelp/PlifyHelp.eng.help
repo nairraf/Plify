@@ -6,6 +6,7 @@
 
 # Usage
     plify <module> <action> [ @{ Param1=Value1; Param2=Value2; [...] } ]
+    plify <shortcut> [ @{ Param1=Value1; Param2=Value2; [...] } ]
 
     <module>                - a valid module name (required)
                               see "Available Modules" below
@@ -17,12 +18,23 @@
                               requested action. See action specific help for valid
                               Action Parameters
 
+    <shortcut>              - Shortcuts replace modules and actions and directly execute
+                              a corresponding module/action. Shortcuts take the same optional
+                              action parameters as the corresponding action. See below for 
+                              available shortcuts.
+
 # Module specific help
     'plify <name of module> -help'              - General module Help
     'plify <name of module> <action> -help'     - Specific module action help
 
 # Available Modules and Module Aliases
+    Module aliases can be used in place of the module name.
+    Below are the available modules and corresponding module aliases:
+
 __MODULEALIASES__
 
 # Availabe Shortcut Commands
+    Shortcuts are aliases for modules and actions. 
+    Below are the available shortcuts:
+
 __PLIFYSHORTCUTS__

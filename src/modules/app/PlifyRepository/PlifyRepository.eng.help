@@ -14,3 +14,6 @@
     Update      Name,Enabled,Description,URL,   Updates a specific repository configuration
                   NewName
     Sync        Force                            Synchronizes repository indexes
+
+## Available Shortcuts
+__MODULESHORTCUTS__:PlifyRepository

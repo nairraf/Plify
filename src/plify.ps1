@@ -49,13 +49,19 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
             $ActionParams = $Action
             $Action = ""
         } else {
-            $shortcut = "$Module.$Action"
+            $shortcut = "$Module $Action"
         }
     } 
 
     if ($PlifyShortcuts.Keys -contains $shortcut) {
+        if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
+            $shortcut = $PlifyShortcuts.$shortcut.Alias
+        }
         $ModuleName = $PlifyShortcuts.$shortcut.Module
         $ActionName = $PlifyShortcuts.$shortcut.Action
+        if ($null -ne $PlifyShortcuts.$shortcut.ActionParams) {
+            $ActionParams += $PlifyShortcuts.$shortcut.ActionParams
+        }
         Write-Debug "Plify Shorcut Detected, Redirecting to Module: $ModuleName, Action: $ActionName"
         $plifyShortcut = $true
     }
