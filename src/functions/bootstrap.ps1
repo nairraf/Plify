@@ -1,29 +1,7 @@
 
 function Initialize-PlifyGlobals() {
-    # Global Variables
     $Global:ds = ([system.io.path]::DirectorySeparatorChar)
-    $Global:plifyDevRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
-    $Global:plifyRoot = (Get-Item $PSScriptRoot).Parent.FullName
-    $Global:plifyModuleRoot = "$plifyRoot$($ds)modules"
-    
-    $Global:PlifyModuleAliases = @{
-        "Configuration" = @("config", "conf")
-        "Repository"     = @("repo")
-    }
-    
-    $Global:PlifyActionMapping = @{
-        "Get" = @("list","show","ls","get")
-        "New" = @("new","add","create")
-        "Initialize" = @("init","initialize")
-        "Remove" = @("delete","del","remove","rm")
-        "Update" = @("update","modify","mod","upd")
-        "Sync" = @("sync","synchronize","pull")
-    }
-
-    $Global:PlifyShortcuts = @{
-        "repolist" = @{Module="PlifyRepository"; Action="Get-PlifyRepository"}
-        "r.l" = @{Module="PlifyRepository"; Action="Get-PlifyRepository"}
-    }
+    . "$PSScriptRoot$($ds)PlifyGlobals.ps1"
 }
 
 <#
@@ -38,7 +16,7 @@ Invoke-PlifyBootstrap
 Invoke-PlifyBootstrap calls Import-PlifyFunctions so you do not have to call this manually
 #>
 function Import-PlifyFunctions() {
-    foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Exclude "bootstrap.ps1" -Recurse)) {
+    foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Exclude "bootstrap.ps1","PlifyGlobals.ps1" -Recurse)) {
         Write-Verbose "importing $($file.FullName)"
         . $file.FullName
     }
