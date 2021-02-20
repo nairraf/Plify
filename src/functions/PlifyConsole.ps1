@@ -1,16 +1,21 @@
-function Script:Write-TableDataToConsole() {
+function Script:Write-TableData() {
     param (
         [Parameter(Mandatory=$true)] [hashtable] $TableData,
         [Parameter(Mandatory=$true)] [array] $ColumnStartIndexes,
         [Parameter(Mandatory=$true)] [string] $HeaderLine,
-        [Parameter(Mandatory=$true)] [string] $HeaderColor
+        [Parameter(Mandatory=$true)] [string] $HeaderColor,
+        [Parameter(Mandatory=$true)] [bool] $ReturnText
     )
-
+    $text = ""
     # display the header - already properly spaced from the header function
-    $ogForeground = [console]::ForegroundColor
-    [console]::ForegroundColor = $HeaderColor
-    Write-Output $HeaderLine
-    [console]::ForegroundColor = $ogForeground
+    if (-not $ReturnText) {
+        $ogForeground = [console]::ForegroundColor
+        [console]::ForegroundColor = $HeaderColor
+        Write-Output $HeaderLine
+        [console]::ForegroundColor = $ogForeground
+    } else {
+        $text += "$HeaderLine`n"
+    }
 
     # we figure out the column spacing in the header functions
     # the header function (Format-PlifyConsole*) then pass the ColumnStartIndexes
@@ -34,21 +39,26 @@ function Script:Write-TableDataToConsole() {
             #}
             $rowline += $columnData
         }
-        Write-Output $rowLine
+        if (-not $ReturnText) {
+            Write-Output $rowLine
+        } else {
+            $text += "$rowLine`n"
+        }
+    }
+    if ($ReturnText) {
+        return $text
     }
 }
 
 function Script:Format-PlifyConsoleAuto() {
     param(
         [Parameter(Mandatory=$true)] [hashtable] $TableData,
-        [Parameter(Mandatory=$true)] [string] $HeaderColor
+        [Parameter(Mandatory=$true)] [string] $HeaderColor,
+        [Parameter(Mandatory=$true)] [bool] $ReturnText,
+        [Parameter(Mandatory=$true)] [int] $LeftPadding
     )
 
-    $width = [console]::WindowWidth
     $numColumns = $TableData.Headers.Count
-    # the max size per screen with some padding
-    $columnMaxWidth = ([math]::Floor($width/$numColumns) - 10)
-
     # figure out the largest string per column
     # we use this number to figure out the sizes of each column
 
@@ -70,7 +80,7 @@ function Script:Format-PlifyConsoleAuto() {
         }
     }
 
-    $padding = 2
+    $padding = $LeftPadding
     
     $headerLine = ""
     # holds the actual index of where we started the columns
@@ -100,13 +110,15 @@ function Script:Format-PlifyConsoleAuto() {
         }
     }
 
-    Write-TableDataToConsole -TableData $TableData -ColumnStartIndexes $columnStartIndexes -HeaderLine $headerLine -HeaderColor $HeaderColor
+    Write-TableData -TableData $TableData -ColumnStartIndexes $columnStartIndexes -HeaderLine $headerLine -HeaderColor $HeaderColor -ReturnText $ReturnText
 }
 
 function Script:Format-PlifyConsoleLeft() {
     param(
         [Parameter(Mandatory=$true)] [hashtable] $TableData,
-        [Parameter(Mandatory=$true)] [string] $HeaderColor
+        [Parameter(Mandatory=$true)] [string] $HeaderColor,
+        [Parameter(Mandatory=$true)] [bool] $ReturnText,
+        [Parameter(Mandatory=$true)] [int] $LeftPadding
     )
 
     $width = [console]::WindowWidth
@@ -120,9 +132,9 @@ function Script:Format-PlifyConsoleLeft() {
 
     # figure out the column start locations and print out the table header row
     for ($c=0; $c -lt $numColumns; $c++) {
-        # the first line start 4 spaces in
+        # the first line starts according to padding
         if ($c -eq 0) { 
-            $columnStartIndexes[$c] = 4
+            $columnStartIndexes[$c] = $LeftPadding
         } else {
             $columnStartIndexes[$c] = $columnStartIndexes[$c-1] + $columnMaxWidth
         }
@@ -133,14 +145,16 @@ function Script:Format-PlifyConsoleLeft() {
         $headerLine += $TableData.Headers[$c]
     }
 
-    Write-TableDataToConsole -TableData $TableData -ColumnStartIndexes $columnStartIndexes -HeaderLine $headerLine -HeaderColor $HeaderColor
+    Write-TableData -TableData $TableData -ColumnStartIndexes $columnStartIndexes -HeaderLine $headerLine -HeaderColor $HeaderColor -ReturnText $ReturnText
 
 }
 
 function Script:Format-PlifyConsoleCenter() {
     param(
         [Parameter(Mandatory=$true)] [hashtable] $TableData,
-        [Parameter(Mandatory=$true)] [string] $HeaderColor
+        [Parameter(Mandatory=$true)] [string] $HeaderColor,
+        [Parameter(Mandatory=$true)] [bool] $ReturnText,
+        [Parameter(Mandatory=$true)] [int] $LeftPadding
     )
 
     $width = [console]::WindowWidth
@@ -179,7 +193,7 @@ function Script:Format-PlifyConsoleCenter() {
         $headerLine += $TableData.Headers[$c]
     }
 
-    Write-TableDataToConsole -TableData $TableData -ColumnStartIndexes $columnStartIndexes -HeaderLine $headerLine -HeaderColor $HeaderColor
+    Write-TableData -TableData $TableData -ColumnStartIndexes $columnStartIndexes -HeaderLine $headerLine -HeaderColor $HeaderColor -ReturnText $ReturnText
 }
 
 
@@ -225,7 +239,9 @@ function Global:Write-PlifyConsole() {
     param(
         [Parameter(Mandatory=$false)] [string] $HeaderColor = "Green",
         [Parameter(Mandatory=$true)] [hashtable] $TableData,
-        [Parameter(Mandatory=$false)] [string] $Format = "Auto"
+        [Parameter(Mandatory=$false)] [string] $Format = "Auto",
+        [Parameter(Mandatory=$false)] [bool] $ReturnText = $false,
+        [Parameter(Mandatory=$false)] [int] $LeftPadding = 2
     )
 
     if ($TableData.Count -eq 0 -or 
@@ -233,6 +249,20 @@ function Global:Write-PlifyConsole() {
         ( $TableData.Keys -contains "Rows" -eq $false ) ) {
         Write-Output "Invalid TableData hashtable detected..exiting"
         return
+    }
+
+    # if we are returning text, then format the first row to underline headers
+    # we do this since we can't colorize output
+    if ($ReturnText) {
+        $lineRow = @()
+        foreach ($header in $TableData.Headers) {
+            $line = ""
+            for ($h=0; $h -lt $header.Length; $h++) {
+                $line += "-"
+            }
+            $lineRow += $line
+        }
+        $TableData.Rows = , ($lineRow) + ($TableData.Rows)
     }
 
     $formatters = @{
@@ -246,9 +276,13 @@ function Global:Write-PlifyConsole() {
         return
     }
 
-    Write-Output ""
+    if (-not $ReturnText) {
+        Write-Output ""
+    }
     
-    & $formatters.$Format -TableData $TableData -HeaderColor $HeaderColor
+    & $formatters.$Format -TableData $TableData -HeaderColor $HeaderColor -ReturnText $ReturnText -LeftPadding $LeftPadding
 
-    Write-Output ""
+    if (-not $ReturnText) {
+        Write-Output ""
+    }
 }

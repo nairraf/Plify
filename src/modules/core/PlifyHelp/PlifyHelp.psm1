@@ -15,13 +15,6 @@ function Get-PlifyHelp() {
     # Always display basic help first
     Get-PlifyHelpText -Module "PlifyHelp" -Action "default"
 
-    # find and print the available App Modules that are installed
-    foreach ($folder in Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.Parent.FullName + "$($ds)app") ) {
-        $moduleName = $folder.BaseName.Replace("Plify","")
-        $aliases = $PlifyModuleAliases["$moduleName"]
-        Write-Output "    $moduleName : $($aliases -join ',')"
-    }
-
     # Get the appropriate .help file for the requested mnodule/action and display it.
     if ($Module -ne "PlifyHelp") {
        Get-PlifyHelpText -Module $Module -Action $Action
@@ -89,6 +82,31 @@ function Write-PlifyConsoleHelpText() {
         if ($line.StartsWith('#')) {
             $line = $line.Replace('#','').Trim()
             $lineColor = "Green"
+        }
+        if ($line.Contains("__MODULEALIASES__")){
+            $aliasesHelp = @{
+                Headers = ("Module","Alias")
+                Rows = @()
+            }
+            foreach ($folder in Get-ChildItem -Path ( (Get-Item $PSScriptRoot).Parent.Parent.FullName + "$($ds)app") ) {
+                $moduleName = $folder.BaseName.Replace("Plify","")
+                $aliases = $PlifyModuleAliases[$moduleName]
+                #$helpTxt += "    $moduleName : $($aliases -join ',')`n"
+                $aliasesHelp.Rows += , ($moduleName, ($aliases -join ','))
+            }
+            $helpTxt = Write-PlifyConsole -TableData $aliasesHelp -ReturnText $true -LeftPadding 4
+            $line = $line.Replace("__MODULEALIASES__", $helpTxt)
+        }
+        if ($line.Contains("__PLIFYSHORTCUTS__")) {
+            $shortcutHelp = @{
+                Headers = @("Shortcut","Equivalent Cmd","Description")
+                Rows = @()
+            }
+            foreach ($shortcut in $PlifyShortcuts.keys) {
+                $shortcutHelp.Rows += , ($shortcut, $PlifyShortcuts.$shortcut.Equivalent, $PlifyShortcuts.$shortcut.Description)
+            }
+            $helpTxt = Write-PlifyConsole -TableData $shortcutHelp -ReturnText $true -LeftPadding 4
+            $line = $line.Replace("__PLIFYSHORTCUTS__", $helpTxt)
         }
         if ($line.Contains("__REMOVEALIASES__")) {
             $line = $line.Replace("__REMOVEALIASES__", ( $PlifyActionMapping["Remove"] -Join "," ) )

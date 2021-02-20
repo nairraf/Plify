@@ -21,4 +21,8 @@
     'plify <name of module> -help'              - General module Help
     'plify <name of module> <action> -help'     - Specific module action help
 
-# Available Modules : Module Aliases
+# Available Modules and Module Aliases
+__MODULEALIASES__
+
+# Availabe Shortcut Commands
+__PLIFYSHORTCUTS__
