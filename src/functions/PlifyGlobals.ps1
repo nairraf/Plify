@@ -24,7 +24,7 @@ $Global:PlifyShortcuts = @{
         Description="Lists plify repositories"
         Equivalent="plify repo list" 
     }
-    "newSigningCert" = @{
+    "newRepoCert" = @{
         Module="PlifyRepository"
         Action="New-PlifyRepositoryCertificate"
         Description="Creates a new repository signing certificate"

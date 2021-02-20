@@ -2,12 +2,12 @@
 ### plify Repository newcert help
     creates a new Plify Repository certificate that is used to sign inventory files
 
+    NOTE: this action is only available through the plify shortcut "newRepoCert"
+
 ### Valid Action Parameters
-    RepositoryName                                      - the name of the repository that
-                                                          holds the inventory file that
-                                                          requires signing.
+    RepositoryName                      - Required. the name of the repository that
+                                          holds the inventory file that requires signing.
+                                                          
 
 #### Examples
-    plify repo newcert @{RepositoryName="MyRepo"}        
-
-#### Shortcut Action only
+    plify newRepoCert @{RepositoryName="MyRepo"}        
