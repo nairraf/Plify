@@ -53,14 +53,23 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
         }
     } 
 
+    # plify shortcuts can overide/point to any module/action
+    # we loop through all available shortcuts and see if we find a match
+    # if we find a match we assign the module/action which will cause plify
+    # bypass the Build-PlifyModuleName, and Build-PlifyActionName functions
+    # which Plify uses to try and detect the correct module and actions
     if ($PlifyShortcuts.Keys -contains $shortcut) {
         if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
             $shortcut = $PlifyShortcuts.$shortcut.Alias
         }
         $ModuleName = $PlifyShortcuts.$shortcut.Module
         $ActionName = $PlifyShortcuts.$shortcut.Action
+        # if the shortcut specified actions, merge them in to the main
+        # ActionParams hashtable
         if ($null -ne $PlifyShortcuts.$shortcut.ActionParams) {
-            $ActionParams += $PlifyShortcuts.$shortcut.ActionParams
+            foreach ($Action in $PlifyShortcuts.$shortcut.ActionParams.Keys) {
+                $ActionParams.$Action = $PlifyShortcuts.$shortcut.ActionParams.$Action
+            }
         }
         Write-Debug "Plify Shorcut Detected, Redirecting to Module: $ModuleName, Action: $ActionName"
         $plifyShortcut = $true
