@@ -1,0 +1,21 @@
+
+### plify Repository RestoreCert help
+    Restores a Plify Repository signing certificate
+
+### Valid Action Parameters
+Name                    - Required. the name of the repository
+Path                    - Required. The full path to the PFX to import
+Force                   - Overwrites previous certificate
+Password                - The password for the PFX archive which contians the certificate
+                          and private key to restore                                          
+
+#### Examples
+    plify repo RestoreCert @{Name="MyRepo";Path="c:\some\where\Myrepo.pfx";Password="secret"} 
+        - restores the certificates for "MyRepo"
+        - does NOT overwrite the existing certificates if they already exist
+        - the password to unencrypt the PFX archive is set to "secret"
+    
+    plify repo restorecert @{Name="MyRepo";Path="c:\some\where\Myrepo.pfx";Password="secret";Force=$true} 
+        - restores the certificates for "MyRepo"
+        - Overwrites the existing certificates if they already exist
+        - the password to unencrypt the PFX archive is set to "secret"

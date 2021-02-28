@@ -102,12 +102,20 @@ function Write-PlifyConsoleHelpText() {
                 Headers = @("Shortcut","Equivalent Cmd","Description")
                 Rows = @()
             }
-            foreach ($shortcut in $PlifyShortcuts.keys) {
+            foreach ($shortcut in $PlifyShortcuts.keys | Sort-Object) {
                 $targetShortcut = $shortcut
                 if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
                        $targetShortcut = $PlifyShortcuts.$shortcut.Alias
+                       $equivalentTxt = "Alias for: $targetShortcut"
+                } else {
+                    $equivalentTxt = $PlifyShortcuts.$targetShortcut.Equivalent
                 }
-                $shortcutHelp.Rows += , ($shortcut, $PlifyShortcuts.$targetShortcut.Equivalent, $PlifyShortcuts.$targetShortcut.Description)
+                # do not display the shortcut if it's set to hidden
+                # we use the not to catch null's and/or hide = False conditions
+                if (-not ($PlifyShortcuts.$shortcut.Hide -eq $true)) {
+
+                    $shortcutHelp.Rows += , ($shortcut, $equivalentTxt, $PlifyShortcuts.$targetShortcut.Description)
+                }
             }
             $helpTxt = Write-PlifyConsole -TableData $shortcutHelp -ReturnText $true -LeftPadding 4
             $line = $line.Replace("__PLIFYSHORTCUTS__", $helpTxt)
@@ -120,13 +128,20 @@ function Write-PlifyConsoleHelpText() {
                     Rows = @()
                 }
                 $module = $moduleLine[1]
-                foreach ($shortcut in $PlifyShortcuts.Keys) {
+                foreach ($shortcut in $PlifyShortcuts.Keys | Sort-Object) {
                     $targetShortcut = $shortcut
                     if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
                         $targetShortcut = $PlifyShortcuts.$shortcut.Alias
+                        $equivalentTxt = "Alias for: $targetShortcut"
+                    } else {
+                        $equivalentTxt = $PlifyShortcuts.$targetShortcut.Equivalent
                     }
                     if ($PlifyShortcuts.$targetShortcut.Module -eq $module) {
-                        $shortcutHelp.Rows += , ($shortcut, $PlifyShortcuts.$targetShortcut.Equivalent, $PlifyShortcuts.$targetShortcut.Description)
+                        # do not display the shortcut if it's set to hidden
+                        # we use the not to catch null's and/or hide = False conditions
+                        if (-not ($PlifyShortcuts.$shortcut.Hide -eq $true)) {
+                            $shortcutHelp.Rows += , ($shortcut, $equivalentTxt, $PlifyShortcuts.$targetShortcut.Description)
+                        }
                     }
                 }
                 $helpTxt = Write-PlifyConsole -TableData $shortcutHelp -ReturnText $true -LeftPadding 4

@@ -15,11 +15,20 @@ Describe 'PlifyRepository Management' {
         Import-Module PlifyRepository
         Mock Get-PlifyConfigurationDir { return $globalPlifyConfigDir } -ParameterFilter { $Scope -eq 'Global' } -ModuleName PlifyRepository
         Initialize-PlifyConfiguration -Scope Global
+
+        $pfxArchive = "$temp$($ds)Test.pfx"
+        if (Test-Path -Path $pfxArchive) {
+            Remove-Item -Path $pfxArchive
+        }
     }
 
     AfterEach {
         if (Test-Path -Path "$localPlifyConfigDir") { Remove-Item -Path $localPlifyConfigDir -Recurse -Force }
         if (Test-Path -Path "$globalPlifyConfigDir") { Remove-Item -Path $globalPlifyConfigDir -Recurse -Force }
+        $pfxArchive = "$temp$($ds)Test.pfx"
+        if (Test-Path -Path $pfxArchive) {
+            Remove-Item -Path $pfxArchive
+        }
     }
 
     It "Get-PlifyRepository Should list two repositories by default" {
@@ -164,5 +173,89 @@ Describe 'PlifyRepository Management' {
         Test-Path -Path $repoCache | Should -BeTrue
         $json = Get-Content -Path $repoCache -Raw | ConvertFrom-Json -Depth 5
         $json.PlifyDev.Count | Should -BeGreaterThan 0
+    }
+
+    It 'Get-PlifyRepositoryCertificateDir should return global certificate directory' {
+        Get-PlifyRepositoryCertificateDir | Should -Be "$globalPlifyConfigDir$($ds)certificates"
+    }
+
+    It 'New-PlifyRepositoryCertificate should not generate a certificate if repository doesnt exist' {
+        { PlifyRepository\New-PlifyRepositoryCertificate -Name "Test" } | Should -Throw
+    }
+
+    It 'New-PlifyRepositoryCertificate should not generate a certificate for default plify repositories' -ForEach @(
+        @{ RepoName="PlifyProd"}
+        @{ RepoName="PlifyDev"}
+    ) {
+        param ( $RepoName )
+        { PlifyRepository\New-PlifyRepositoryCertificate -Name $RepoName } | Should -Throw
+    }
+
+    It 'New-PlifyRepositoryCertificate should generate a certificate' {
+        PlifyRepository\New-PlifyRepository -Name "Test"
+        PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
+        $certDir = Get-PlifyRepositoryCertificateDir
+        Test-Path -Path "$certDir$($ds)Test.key.private" | Should -BeTrue
+        Test-Path -Path "$certDir$($ds)Test.key.public" | Should -BeTrue
+        Test-Path -Path "$certDir$($ds)Test.crt" | Should -BeTrue
+        $testRepo = PlifyRepository\Get-PlifyRepository -Name "Test"
+        $testRepo.Thumbprint | Should -Not -BeNullOrEmpty
+    }
+
+    It 'Backup-PlifyRepositoryCertificate should not backup a cert if the file already exists' {
+        # create a test repository and certificate
+        # create a fake backup file, and make sure it's not overwritten by comparing modification dates and sizes
+        PlifyRepository\New-PlifyRepository -Name "Test"
+        PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
+        $pfxArchive = "$temp$($ds)Test.pfx"
+        New-Item -Path $pfxArchive -ItemType File
+        { Backup-PlifyRepositoryCertificate -Name Test -Path $temp -Password "password" } | Should -Throw
+    }
+
+    It 'Backup-PlifyRepositoryCertificate should backup a cert if the file already exists with force' {
+        # create a test repository and certificate
+        # create a fake backup file, and make sure it's not overwritten by comparing modification dates and sizes
+        PlifyRepository\New-PlifyRepository -Name "Test"
+        PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
+        New-Item -Path $pfxArchive -ItemType File
+        $fakefile = Get-Item -Path $pfxArchive | Select-Object LastWriteTimeUtc,Length
+        PlifyRepository\Backup-PlifyRepositoryCertificate -Name Test -Path $temp -Force -Password "password"
+        $metaFile = (Get-Item -Path $pfxArchive | Select-Object LastWriteTimeUtc,Length)
+        $metaFile.LastWriteTimeUtc | Should -BeGreaterThan $fakefile.LastWriteTimeUtc
+        $metaFile.Length | Should -BeGreaterThan $fakefile.Length
+    }
+
+    It 'Backup-PlifyRepositoryCertificate should generate a pfx archive to a user specified location' {
+        PlifyRepository\New-PlifyRepository -Name "Test"
+        PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
+        $pfxArchive = "$temp$($ds)Test.pfx"
+        PlifyRepository\Backup-PlifyRepositoryCertificate -Name Test -Path $temp -Password "password"
+        Test-Path -Path $pfxArchive | Should -BeTrue
+    }
+
+    It 'Restore-PlifyRepositoryCertificate should not restore certificate if one already exists' {
+        PlifyRepository\New-PlifyRepository -Name "Test"
+        PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
+        $pfxArchive = "$temp$($ds)Test.pfx"
+        PlifyRepository\Backup-PlifyRepositoryCertificate -Name Test -Path $temp -Password "password"
+        { PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path $pfxArchive -Password "password" } | Should -Throw
+    }
+
+    It 'Restore-PlifyRepositoryCertificate should restore certificate if one already exists with force' {
+        PlifyRepository\New-PlifyRepository -Name "Test"
+        PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
+        $pfxArchive = "$temp$($ds)Test.pfx"
+        PlifyRepository\Backup-PlifyRepositoryCertificate -Name Test -Path $temp -Password "password"
+        $privateKeyPre = Get-Item -Path "$globalPlifyConfigDir$($ds)certificates$($ds)Test.key.private"
+        PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path $pfxArchive -Password "password" -Force
+        $privateKeyPost = Get-Item -Path "$globalPlifyConfigDir$($ds)certificates$($ds)Test.key.private"
+        $privateKeyPost.LastWriteTimeUtc | Should -BeGreaterThan $privateKeyPre.LastWriteTimeUtc
+    }
+
+    It 'Restore-PlifyRepositoryCertificate should not try and restore an invalid backup' {
+        PlifyRepository\New-PlifyRepository -Name "Test"
+        PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
+        { PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path "bad\path" -Password "password" -Force } | Should -Throw "Invalid PFX Path*"
+        { PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path "bad\path.pfx" -Password "password" -Force } | Should -Throw "Invalid PFX Path*"
     }
 }

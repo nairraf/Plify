@@ -18,18 +18,6 @@ $Global:PlifyActionMapping = @{
 }
 
 $Global:PlifyShortcuts = @{
-    "rl" = @{
-        Module="PlifyRepository"
-        Action="Get-PlifyRepository"
-        Description="Lists plify repositories"
-        Equivalent="plify repo list" 
-    }
-    "newRepoCert" = @{
-        Module="PlifyRepository"
-        Action="New-PlifyRepositoryCertificate"
-        Description="Creates a new repository signing certificate"
-        Equivalent="None. Shortcut Only" 
-    }
     "globalConfig" = @{
         Module="PlifyConfiguration"
         Action="Get-PlifyConfiguration"
@@ -37,7 +25,44 @@ $Global:PlifyShortcuts = @{
         Equivalent="plify config get @{Scope='Global'}"
         ActionParams=@{Scope="Global"}
     }
-    "gc" = @{
-        Alias="globalConfig"
+    "gc" = @{Alias="globalConfig"}
+    "rl" = @{
+        Module="PlifyRepository"
+        Action="Get-PlifyRepository"
+        Description="Lists plify repositories"
+        Equivalent="plify repo list" 
+    }
+    "repository newcert" = @{
+        Module="PlifyRepository"
+        Action="New-PlifyRepositoryCertificate"
+        Description="Creates a new repository signing certificate"
+        Equivalent="None. Shortcut Only"
+        Hide=$true
+    }
+    "repo newcert" = @{
+        Alias="repository newcert"
+        Hide=$true
+    }
+    "repository backupcert" = @{
+        Module="PlifyRepository"
+        Action="Backup-PlifyRepositoryCertificate"
+        Description="Backup an existing repository signing certificate"
+        Equivalent="None. Shortcut Only"
+        Hide=$true
+    }
+    "repo backupcert" = @{
+        Alias="repository backupcert"
+        Hide=$true
+    }
+    "repository restorecert" = @{
+        Module="PlifyRepository"
+        Action="Restore-PlifyRepositoryCertificate"
+        Description="Restore repository signing certificate"
+        Equivalent="None. Shortcut Only"
+        Hide=$true
+    }
+    "repo restorecert" = @{
+        Alias="repository restorecert"
+        Hide=$true
     }
 }

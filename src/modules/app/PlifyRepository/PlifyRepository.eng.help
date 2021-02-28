@@ -6,14 +6,17 @@
     plify Repository <action>
 
 ## Available Actions
-    Action      Action Parameters               Description
-    ------      -----------------               -----------
-    Get         Name                            Get the current list of repositories
-    New         Name,Enabled,Description,URL    Adds a new plify repository
-    Remove      Name                            Removes a plify Repository
-    Update      Name,Enabled,Description,URL,   Updates a specific repository configuration
-                  NewName
-    Sync        Force                            Synchronizes repository indexes
+    Action          Action Parameters               Description
+    ------          -----------------               -----------
+    BackupCert      Name,Path,Force,Password        Backup an existing repository signing certificate
+    Get             Name                            Get the current list of repositories
+    New             Name,Enabled,Description,URL    Adds a new plify repository
+    NewCert         Name,Days,KeySize,Force         Creates a new repository signing certificate
+    Remove          Name                            Removes a plify Repository
+    RestoreCert     Name,Path,Force,Password        Restores a repository signing certificate
+    Update          Name,Enabled,Description,URL,   Updates a specific repository configuration
+                      NewName
+    Sync            Force                            Synchronizes repository indexes
 
 ## Available Shortcuts
 __MODULESHORTCUTS__:PlifyRepository

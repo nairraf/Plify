@@ -22,6 +22,25 @@ function Import-PlifyFunctions() {
     }
 }
 
+function Reset-Plify() {
+    param (
+        [Parameter(Mandatory=$false)] [bool] $ReBootStrap = $true
+    )
+
+    Write-Debug "Removing Plify Modules from current Scope"
+    Get-Module -Name Plify* | Import-Module
+    Remove-Module Plify*
+    Write-Debug "Removing Plify Functions from current Scope"
+    Get-Item -Path Function:\*Plify* | Remove-Item -ErrorAction SilentlyContinue
+    if ($ReBootStrap) {
+        Write-Debug "Re-Bootstrapping Plify functions and modules"
+        # since we removed all plify functions and modules, we need to source the current file back into local scope
+        . $PSCommandPath
+        Invoke-PlifyBootstrap
+        Update-FormatData
+    }
+}
+
 <#
 .SYNOPSIS
 Main BootStrap Function to bootstrap plify

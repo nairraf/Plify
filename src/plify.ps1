@@ -18,15 +18,7 @@ Invoke-PlifyBootstrap
 # we import modules on demand - no preloading
 # so flush will import all modules, then remove them so that the ones that are re-loaded are fresh
 if ($Flush) {
-    Write-Debug "Removing Plify Modules from current Scope"
-    Get-Module -Name Plify* | Import-Module
-    Remove-Module Plify*
-    Write-Debug "Removing Plify Functions from current Scope"
-    Get-Item -Path Function:\*Plify* | Remove-Item -ErrorAction SilentlyContinue
-    Write-Debug "Re-Bootstrapping Plify functions and modules"
-    . $bootStrapScript
-    Invoke-PlifyBootstrap
-    Update-FormatData
+    Reset-Plify
 }
 
 # test if we have a verbose or debug flag and pass it on so modules can use them
@@ -131,6 +123,17 @@ try {
         & $ModuleFound\$ActionFound @extraFlags
     }
 } catch {
-    Write-Error -Message "Error Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
-    $error
+    $ogForeground = [console]::ForegroundColor
+    [console]::ForegroundColor = "Red"
+    Write-Output ""
+    Write-Output "Error Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
+    [console]::ForegroundColor = $ogForeground
+    Write-Output ""
+    [console]::ForegroundColor = "Yellow"
+    Write-Output "Error Stack:"
+    [console]::ForegroundColor = $ogForeground
+    foreach ($e in $error) {
+        Write-Output "  $($e.ToString())"
+    }
+    Write-Output ""
 }

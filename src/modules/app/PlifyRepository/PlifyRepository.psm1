@@ -5,6 +5,23 @@ foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Recurse)) {
     . $file.FullName
 }
 
+function Get-PlifyRepositoryOpenSSL() {
+    return "$PSScriptRoot$($ds)bin$($ds)openssl$($ds)openssl.exe"
+}
+
+function Get-PlifyRepositoryOpenSSLConfig() {
+    return "$PSScriptRoot$($ds)bin$($ds)openssl$($ds)openssl.cnf"
+}
+
+function Get-PlifyRepositoryCertificateDir() {
+    $configDir = PlifyConfiguration\Get-PlifyConfigurationDir -Scope "Global"
+    $repoCertDir = "$configDir$($ds)certificates"
+    if ( -not (Test-Path -Path $repoCertDir)) {
+        New-Item -Path $repoCertDir -ItemType Directory | Out-Null
+    }
+    return $repoCertDir
+}
+
 ##
 function Get-PlifyRepository() {
     param (
@@ -140,8 +157,101 @@ function Update-PlifyRepository() {
     }
 }
 
+function Backup-PlifyRepositoryCertificate() {
+    param(
+        [Parameter(Mandatory=$true)] [string] $Name,
+        [Parameter(Mandatory=$true)] [string] $Path,
+        [Parameter(Mandatory=$true)] [string] $Password,
+        [Parameter(Mandatory=$false)] [switch] $Force
+    )
+    $openssl = Get-PlifyRepositoryOpenSSL
+    $certDir = Get-PlifyRepositoryCertificateDir
+    $certBaseName = "$certDir$($ds)$Name"
+    $backupFileName = "$Path$($ds)$Name.pfx"
+
+    # make sure that we have a private key and a certificate for this repository
+    if ( (Test-Path -Path "$certBaseName.key.private") -eq $false -and (Test-Path -Path "$certBaseName.crt") -eq $false ) {
+        throw "Certificate files not found for repository: $Name"
+    }
+    
+    # we do not overwrite backup files unless forced
+    if ( (Test-Path -Path $backupFileName) -eq $true -and $Force -eq $false ) {
+        Throw "BackupFile: $backupFileName already exists...skipping"
+    }
+
+    & $openssl pkcs12 -export -out $backupFileName -inkey "$certBaseName.key.private" -in "$certBaseName.crt" -passout pass:$Password 2>&1 | Out-Null
+    if ( ($LASTEXITCODE -gt 0) -or (Test-Path -Path $backupFileName) -eq $false ){
+        throw "Failed backingup certificate to $backupFileName"
+    }
+
+    Write-Output ""
+    Write-Output "BackupFile: $backupFileName created succesfully"
+    Write-Output ""
+    return
+}
+
+function Get-PlifyRepositoryPublicKey() {
+    param(
+        [Parameter(Mandatory=$true)] [string] $Name
+    )
+    $openssl = Get-PlifyRepositoryOpenSSL
+    $certDir = Get-PlifyRepositoryCertificateDir
+    $certBaseName = "$certDir$($ds)$Name"
+
+    # extract the public key from the public cert
+    & $openssl x509 -in "$certBaseName.crt" -pubkey -noout > "$certBaseName.key.public" 2>&1 | Out-Null
+    if ($LASTEXITCODE -gt 0) {
+        throw "Failed to extract public key from certificate: $certBaseName.crt"
+    }
+
+    Update-PlifyRepository -Name $Name -Thumbprint (Get-FileHash -Path "$certBaseName.key.public" -Algorithm SHA256).Hash | Out-Null
+}
+
+function Restore-PlifyRepositoryCertificate() {
+    param(
+        [Parameter(Mandatory=$true)] [string] $Name,
+        [Parameter(Mandatory=$true)] [string] $Path,
+        [Parameter(Mandatory=$true)] [string] $Password,
+        [Parameter(Mandatory=$false)] [switch] $Force
+    )
+    $openssl = Get-PlifyRepositoryOpenSSL
+    $certDir = Get-PlifyRepositoryCertificateDir
+    $certBaseName = "$certDir$($ds)$Name"
+
+    if ( (Test-Path -Path $Path) -eq $False -or ($Path.EndsWith("pfx")) -eq $false) {
+        throw "Invalid PFX Path: file doesn't exist or is not a PFX file"
+    }
+
+    # make sure we don't restore a certifacte over an existing one unless forced
+    if ( (Test-Path -Path "$certBaseName.key.private") -eq $true -and $Force -eq $false) {
+        throw "Certificate already exists...skipping"
+    }
+
+    & $openssl pkcs12 -in $Path -nocerts -nodes -passin pass:$Password | & $openssl pkcs8 -nocrypt -out "$certBaseName.key.private" 2>&1 | Out-Null
+    if ($LASTEXITCODE -gt 0) {
+        throw "Error Restoring Private Key Certificate from PFX: $Path"
+    }
+
+    & $openssl pkcs12 -in $Path -nokeys -clcerts -passin pass:$Password | & $openssl x509 -out "$certBaseName.crt" 2>&1 | Out-Null
+    if ($LASTEXITCODE -gt 0) {
+        throw "Error Restoring Certificate from PFX: $Path"
+    }
+
+    & $openssl x509 -in "$certBaseName.crt" -pubkey -noout > "$certBaseName.key.public" | Out-Null
+    if ($LASTEXITCODE -gt 0) {
+        throw "Error Restoring Public Key from PFX: $Path"
+    }
+
+    Get-PlifyRepositoryPublicKey -Name $Name
+
+    Write-Output ""
+    Write-Output "Restored Certificate: $Path for repo: $Name"
+    Write-Output ""
+    return
+}
+
 function Get-PlifyRepositoryCacheFile() {
-    return "$(PlifyConfiguration\Get-PlifyConfigurationDir -Scope "Global")$($ds)repositorycache.json"
+    return "$(PlifyConfiguration\Get-PlifyConfigurationDir -Scope 'Global')$($ds)repositorycache.json"
 }
 
 function Sync-PlifyRepository() {
@@ -201,4 +311,48 @@ function Sync-PlifyRepository() {
     $end = Get-Date
     Write-Output "Complete"
     Write-Debug " Update Process run time: $($end - $start)"
+}
+
+function New-PlifyRepositoryCertificate() {
+    param(
+        [Parameter(Mandatory=$true)] [string] $Name,
+        [Parameter(Mandatory=$false)] [string] $Days = 3650, 
+        [Parameter(Mandatory=$false)] [int] $KeySize = 4096,
+        [Parameter(Mandatory=$false)] [switch] $Force
+    )
+
+    # only generate certs for existing repositories
+    if ( $null -eq (Get-PlifyRepository -Name $Name) ) {
+        throw "Repository $Name doesn't exist, please create that first"
+    }
+
+    $openssl = Get-PlifyRepositoryOpenSSL
+    $config = Get-PlifyRepositoryOpenSSLConfig
+    $certDir = Get-PlifyRepositoryCertificateDir
+    $certBaseName = "$certDir$($ds)$Name"
+
+    $subject = "/CN=$Name"
+
+    # make sure we don't overwrite certs unless forced
+    if ( (Test-Path -Path "$certBaseName.key.private") -eq $true -and $Force -eq $false ) {
+        throw "Certificate for repository $Name already exists...skipping"
+    }
+
+    # we never regenerate certificates for plify default repo's
+    if ($Name -eq "PlifyProd" -or $Name -eq "PlifyDev") {
+        throw "Can't generate certificates for default Plify Repositories!!"
+    }
+
+    # generate the new private key and public cert
+    & $openssl req -x509 -newkey rsa:$KeySize -keyout "$certBaseName.key.private" -out "$certBaseName.crt" -days $Days -nodes -subj $subject -config $config 2>&1 | Out-Null
+    if ($LASTEXITCODE -gt 0) {
+        Write-Error "Failed to generate new certificates: $certBaseName[.crt|.key.private]" -ErrorAction SilentlyContinue
+        throw
+    }
+
+    Get-PlifyRepositoryPublicKey -Name $Name
+
+    Write-Output ""
+    Write-Output "Created Certificate for Repository: $Name"
+    Write-Output ""
 }

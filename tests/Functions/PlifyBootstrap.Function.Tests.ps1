@@ -15,7 +15,7 @@ Describe 'Invoke-PlifyBootstrap' {
 
     it 'Plify Functions should not exist in Global Scope Yet' {
         # boot strap contains two plify functions, so only those should exist at this point
-        (Get-Item -Path Function:\*Plify*).Count | Should -Be 3
+        (Get-Item -Path Function:\*Plify*).Count | Should -Be 4
     }
 
     it 'Plify Functions should now exist in Global Scope' {

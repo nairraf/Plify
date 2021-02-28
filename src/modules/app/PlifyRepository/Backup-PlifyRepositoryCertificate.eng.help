@@ -1,0 +1,22 @@
+
+### plify Repository BackupCert help
+    backup an existing Plify Repository signing certificate
+
+### Valid Action Parameters
+Name                    - Required. the name of the repository that
+                          holds the inventory file that requires signing.
+Path                    - Required. The directory where the backup should be placed
+Force                   - Overwrites previous backup files if they exist
+Password                - The password for the PFX archive which contians the certificate
+                          and private key                                           
+
+#### Examples
+    plify repo BackupCert @{Name="MyRepo";Path="c:\some\where";Password="secret"} 
+        - backs up the certificates for "MyRepo". creates "C:\some\where\MyRepo.pfx" backup file
+        - does NOT overwrite the file if it already exists, meaning the backup will be skipped
+        - the backup (in PFX format) is protected with "secret" as a password
+    
+    plify repo backupcert @{Name="MyRepo";Path="c:\some\where";Password="secret";Force=$true} 
+        - backs up the certificates for "MyRepo". creates "C:\some\where\MyRepo.pfx" backup file
+        - will overwrite the file if it already exists
+        - the backup (in PFX format) is protected with "secret" as a password
