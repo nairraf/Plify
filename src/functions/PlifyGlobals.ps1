@@ -2,6 +2,7 @@
 $Global:plifyDevRoot = (Get-Item $PSScriptRoot).Parent.Parent.FullName
 $Global:plifyRoot = (Get-Item $PSScriptRoot).Parent.FullName
 $Global:plifyModuleRoot = "$plifyRoot$($ds)modules"
+$Global:plifyTypesRoot = "$plifyModuleRoot$($ds)types"
 
 $Global:PlifyModuleAliases = @{
     "Configuration" = @("config", "conf")

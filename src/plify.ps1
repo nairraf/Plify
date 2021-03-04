@@ -117,23 +117,50 @@ if ($Help) {
 try {
     if ($ActionParams.Count -gt 0) {
         Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
-        & $ModuleFound\$ActionFound @ActionParams @extraFlags
+        $ret = & $ModuleFound\$ActionFound @ActionParams @extraFlags
     } else {
         Write-Debug "Executing: $($ModuleFound.Name)\$($ActionFound.Name)"
-        & $ModuleFound\$ActionFound @extraFlags
+        $ret = & $ModuleFound\$ActionFound @extraFlags
     }
+    
+    # see if we have a next call or not
+    # if there is no NextCall property in the object than this will throw, which we can safely catch and set that there is no next call
+    try {
+        $NextCallDetected = ($ret.NextCall).GetType().Name -eq "PlifyNextCall"
+    } catch {
+        $NextCallDetected = $false
+    }
+
+    if ( $NextCallDetected -eq $false) {
+        $ret
+    } else {
+        Write-Output ""
+        Write-Output "$($ret.Status) - $($ret.Message)"
+
+        # if the last call passed and we have a next module and action
+        # see if we can find the module/action then call it
+        # we loop until there is no next call or we encounter an error
+        while ( [string]::IsNullOrEmpty($ret.NextCall.Module) -eq $false -and 
+                [string]::IsNullOrEmpty($ret.NextCall.Action) -eq $false -and 
+                $ret.ExitCode -eq 0) {
+            $ModuleFound = PlifyRouter\Get-PlifyModule -ModuleName ($ret.NextCall.Module)
+            $ActionFound = PlifyRouter\Get-PlifyModuleAction -Module $ModuleFound -ActionName ($ret.NextCall.Action)
+            [hashtable] $parms = $ret.NextCall.ActionParams
+            if ([string]::IsNullOrEmpty($ModuleFound) -eq $false -and [string]::IsNullOrEmpty($ActionFound) -eq $false){
+                $ret = & $ModuleFound\$ActionFound @parms @extraFlags
+                $ret
+            }
+        }
+    }
+
+    if ($ret.ExitCode -gt 0) {
+        if ($error.count -gt 0) {
+            Write-PlifyErrors
+        }
+    }
+
+    exit $ret.ExitCode
 } catch {
-    $ogForeground = [console]::ForegroundColor
-    [console]::ForegroundColor = "Red"
-    Write-Output ""
-    Write-Output "Error Executing: $($ModuleFound.Name)\$($ActionFound.Name) $ActionParamsString"
-    [console]::ForegroundColor = $ogForeground
-    Write-Output ""
-    [console]::ForegroundColor = "Yellow"
-    Write-Output "Error Stack:"
-    [console]::ForegroundColor = $ogForeground
-    foreach ($e in $error) {
-        Write-Output "  $($e.ToString())"
-    }
-    Write-Output ""
+    Write-PlifyErrors
+    exit 1
 }

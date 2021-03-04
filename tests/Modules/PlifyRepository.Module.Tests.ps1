@@ -180,7 +180,15 @@ Describe 'PlifyRepository Management' {
     }
 
     It 'New-PlifyRepositoryCertificate should not generate a certificate if repository doesnt exist' {
-        { PlifyRepository\New-PlifyRepositoryCertificate -Name "Test" } | Should -Throw
+        $output = PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
+        $output.ExitCode | Should -BeGreaterThan 0
+        $output.GetType().Name | Should -Be 'PlifyReturn'
+    }
+    
+    It 'New-PlifyRepositoryCertificate should not overwrite a certificate' {
+        PlifyRepository\New-PlifyRepository -Name "Test"
+        (PlifyRepository\New-PlifyRepositoryCertificate -Name "Test").ExitCode | Should -Be 0
+        (PlifyRepository\New-PlifyRepositoryCertificate -Name "Test").ExitCode | Should -BeGreaterThan 0
     }
 
     It 'New-PlifyRepositoryCertificate should not generate a certificate for default plify repositories' -ForEach @(
@@ -188,7 +196,7 @@ Describe 'PlifyRepository Management' {
         @{ RepoName="PlifyDev"}
     ) {
         param ( $RepoName )
-        { PlifyRepository\New-PlifyRepositoryCertificate -Name $RepoName } | Should -Throw
+        (PlifyRepository\New-PlifyRepositoryCertificate -Name $RepoName).ExitCode | Should -BeGreaterThan 0
     }
 
     It 'New-PlifyRepositoryCertificate should generate a certificate' {
@@ -209,7 +217,7 @@ Describe 'PlifyRepository Management' {
         PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
         $pfxArchive = "$temp$($ds)Test.pfx"
         New-Item -Path $pfxArchive -ItemType File
-        { Backup-PlifyRepositoryCertificate -Name Test -Path $temp -Password "password" } | Should -Throw
+        (Backup-PlifyRepositoryCertificate -Name Test -Path $temp -Password "password").ExitCode | Should -BeGreaterThan 0
     }
 
     It 'Backup-PlifyRepositoryCertificate should backup a cert if the file already exists with force' {
@@ -238,7 +246,7 @@ Describe 'PlifyRepository Management' {
         PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
         $pfxArchive = "$temp$($ds)Test.pfx"
         PlifyRepository\Backup-PlifyRepositoryCertificate -Name Test -Path $temp -Password "password"
-        { PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path $pfxArchive -Password "password" } | Should -Throw
+        (PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path $pfxArchive -Password "password").ExitCode | Should -BeGreaterThan 0
     }
 
     It 'Restore-PlifyRepositoryCertificate should restore certificate if one already exists with force' {
@@ -255,7 +263,7 @@ Describe 'PlifyRepository Management' {
     It 'Restore-PlifyRepositoryCertificate should not try and restore an invalid backup' {
         PlifyRepository\New-PlifyRepository -Name "Test"
         PlifyRepository\New-PlifyRepositoryCertificate -Name "Test"
-        { PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path "bad\path" -Password "password" -Force } | Should -Throw "Invalid PFX Path*"
-        { PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path "bad\path.pfx" -Password "password" -Force } | Should -Throw "Invalid PFX Path*"
+        (PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path "bad\path" -Password "password" -Force).ExitCode | Should -BeGreaterThan 0
+        (PlifyRepository\Restore-PlifyRepositoryCertificate -Name "Test" -Path "bad\path.pfx" -Password "password" -Force).ExitCode | Should -BeGreaterThan 0
     }
 }

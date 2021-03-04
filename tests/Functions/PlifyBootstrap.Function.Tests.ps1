@@ -1,4 +1,5 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
+using module .\..\..\src\types\PlifyReturn.psm1
 BeforeAll {
     # we do not do anything in this before all, as we are testing the bootstrap process, not using it yet
 }
@@ -18,7 +19,7 @@ Describe 'Invoke-PlifyBootstrap' {
         (Get-Item -Path Function:\*Plify*).Count | Should -Be 4
     }
 
-    it 'Plify Functions should now exist in Global Scope' {
+    it 'Plify Functions and types should now exist' {
         # Invoke the bootstrap
         Invoke-PlifyBootstrap
 
@@ -32,5 +33,6 @@ Describe 'Invoke-PlifyBootstrap' {
         $plifyModuleRoot  | Should -be -not $null
         $PlifyModuleAliases | Should -be -not $null
         $PlifyActionMapping | Should -be -not $null
+        { [PlifyReturn]::new() } | Should -Not -Throw
     }
 }

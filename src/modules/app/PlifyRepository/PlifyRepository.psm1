@@ -1,18 +1,31 @@
 #Requires -Modules powershell-yaml
+using module .\..\..\..\types\PlifyReturn.psm1
 
 # import all our external module functions into the modules current scope on module load
 foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Recurse)) {  
     . $file.FullName
 }
 
+<#
+.SYNOPSIS
+Returns the location of the bundled openssl.exe
+#>
 function Get-PlifyRepositoryOpenSSL() {
     return "$PSScriptRoot$($ds)bin$($ds)openssl$($ds)openssl.exe"
 }
 
+<#
+.SYNOPSIS
+Returns the location of the plify openssl configuratio file
+#>
 function Get-PlifyRepositoryOpenSSLConfig() {
     return "$PSScriptRoot$($ds)bin$($ds)openssl$($ds)openssl.cnf"
 }
 
+<#
+.SYNOPSIS
+Returns the plify global certificate directory to the caller
+#>
 function Get-PlifyRepositoryCertificateDir() {
     $configDir = PlifyConfiguration\Get-PlifyConfigurationDir -Scope "Global"
     $repoCertDir = "$configDir$($ds)certificates"
@@ -22,7 +35,21 @@ function Get-PlifyRepositoryCertificateDir() {
     return $repoCertDir
 }
 
-##
+<#
+.SYNOPSIS
+List all the repositories in the global configuration
+
+.PARAMETER Name
+By default all repositories are listed. you can filter
+the results using the name parameter. Wildcards are supported
+
+.EXAMPLE
+plify repo ls @{Name=*prod*}
+    # lists all repositories with prod in their name
+
+.NOTES
+'plify repo get' is mapped here
+#>
 function Get-PlifyRepository() {
     param (
         [Parameter(Mandatory=$false)] [string] $Name = ""
@@ -47,6 +74,7 @@ function Get-PlifyRepository() {
 
     foreach ($repo in ($repos.Repositories.Keys | Sort-Object)) {
         $Repositories += [PSCustomObject]@{
+            ExitCode = [PlifyStatus]::OK
             PSTypeName = "Plify.Repository"
             Name = $repo
             Enabled = $repos.Repositories.$repo.enabled
@@ -59,6 +87,30 @@ function Get-PlifyRepository() {
     return $Repositories
 }
 
+<#
+.SYNOPSIS
+Adds a new plify repository to the global configuration
+
+.PARAMETER Name
+The name of the new repository
+
+.PARAMETER Enabled
+Enable (true) or Disable (false) the new repository
+Default is False
+
+.PARAMETER Description
+The description of the new repository
+
+.PARAMETER URL
+The URL for the new repository. This should be the URL 
+of where the repositories inventory file is located 
+
+.PARAMETER Thumbprint
+Thumbprint of the repositories public certificate
+
+.NOTES
+'plify repo new' is mapped here
+#>
 function New-PlifyRepository() {
     param(
         [Parameter(Mandatory=$true)] [string] $Name,
@@ -79,10 +131,22 @@ function New-PlifyRepository() {
 
         PlifyConfiguration\Set-PlifyGlobalConfig -Config $repos -RootElement "Repositories"
 
-        Write-Output "Added New Plify Repository: $Name"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::OK, 
+            (Get-PlifyMessage -Module Repository -Message AddRepositorySuccess -Replacements @{Name=$Name}) )
     }
 }
 
+<#
+.SYNOPSIS
+Removes a plify repository from the global configuration
+
+.PARAMETER Name
+The name of the repository to remove
+
+.NOTES
+'plify repo remove' is mapped here
+#>
 function Remove-PlifyRepository() {
     param(
         [Parameter(Mandatory=$true)] [string] $Name
@@ -102,10 +166,41 @@ function Remove-PlifyRepository() {
 
         PlifyConfiguration\Set-PlifyGlobalConfig -Config $newRepos -RootElement "Repositories"
 
-        Write-Output "Removed Plify Repository: $Name"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::OK, 
+            (Get-PlifyMessage -Module Repository -Message RemoveRepositorySuccess -Replacements @{Name=$Name}) )
     }
 }
 
+<#
+.SYNOPSIS
+Updates Plify Repository Settings
+
+.PARAMETER Name
+The name of the plify repository to modify
+
+.PARAMETER Enabled
+Control if the repository is Enabled (true) or Disabled (False)
+Disabled repositories do not have their inventory cached
+
+.PARAMETER NewName
+Renames a repository
+
+.PARAMETER Description
+The reposotiry description
+
+.PARAMETER URL
+The base URL of the repository. this should be the directory
+where the repository inventory file is located
+
+.PARAMETER Thumbprint
+The Certificate Public Key's computed hash.
+NOTE: New|Restore-PlifyRepositoryCertificate (or 'plify repo [new|restore]cert')
+automatically set the repository thumbprint
+
+.NOTES
+'plify repo update' is mapped here
+#>
 function Update-PlifyRepository() {
     param (
         [Parameter(Mandatory=$true)] [string] $Name,
@@ -150,13 +245,45 @@ function Update-PlifyRepository() {
         }
         if ($updated) {
             PlifyConfiguration\Set-PlifyGlobalConfig -Config $repos -RootElement "Repositories"
-            Write-Output ""
-            Write-Output "Updated Repository: $Name"
-            PlifyRepository\Get-PlifyRepository -Name $Name
+            $NextCall = [PlifyNextCall]::new(
+                "PlifyRepository",
+                "Get-PlifyRepository",
+                @{Name=$Name}
+            )
+            return [PlifyReturn]::new(
+                [PlifyStatus]::OK, 
+                (Get-PlifyMessage -Module Repository -Message UpdatedRepo -Replacements @{Name=$Name}),
+                $NextCall )
         }
     }
 }
 
+<#
+.SYNOPSIS
+Backups up a plify repository certificate
+
+.DESCRIPTION
+Exports a repository certificate to an encrypted PFX file
+that van later be imported
+
+.PARAMETER Name
+The name of the repository holding the certificate that
+should be backed up
+
+.PARAMETER Path
+The directory where the PFX file will be placed. The PFX
+Backup file will be called <repo>.pfx.
+
+.PARAMETER Password
+The password for the PFX archive. This password will be needed
+to open and/or restore the PFX archive at a later date
+
+.PARAMETER Force
+Overwrite a previously backed up PFX archive
+
+.NOTES
+'plify repo backupcert' is mapped here
+#>
 function Backup-PlifyRepositoryCertificate() {
     param(
         [Parameter(Mandatory=$true)] [string] $Name,
@@ -171,26 +298,51 @@ function Backup-PlifyRepositoryCertificate() {
 
     # make sure that we have a private key and a certificate for this repository
     if ( (Test-Path -Path "$certBaseName.key.private") -eq $false -and (Test-Path -Path "$certBaseName.crt") -eq $false ) {
-        throw "Certificate files not found for repository: $Name"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message ErrorCertFilesNotFound -Replacements @{Name=$Name}) )
     }
     
     # we do not overwrite backup files unless forced
     if ( (Test-Path -Path $backupFileName) -eq $true -and $Force -eq $false ) {
-        Throw "BackupFile: $backupFileName already exists...skipping"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message BackupFileExists -Replacements @{FILEPATH=$backupFileName}) )
     }
 
     & $openssl pkcs12 -export -out $backupFileName -inkey "$certBaseName.key.private" -in "$certBaseName.crt" -passout pass:$Password 2>&1 | Out-Null
     if ( ($LASTEXITCODE -gt 0) -or (Test-Path -Path $backupFileName) -eq $false ){
-        throw "Failed backingup certificate to $backupFileName"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message BackupFailed -Replacements @{FILEPATH=$backupFileName}) )
     }
 
-    Write-Output ""
-    Write-Output "BackupFile: $backupFileName created succesfully"
-    Write-Output ""
-    return
+    return [PlifyReturn]::new(
+            [PlifyStatus]::OK, 
+            (Get-PlifyMessage -Module Repository -Message BackupSuccess -Replacements @{FILEPATH=$backupFileName}) )
 }
 
-function Get-PlifyRepositoryPublicKey() {
+<#
+.SYNOPSIS
+Extracts the public key from the public certificate
+
+.DESCRIPTION
+Long description
+
+.PARAMETER Name
+The name of the repository that the extracted key is for
+
+.EXAMPLE
+try {
+    Set-PlifyRepositoryPublicKey -Name SomeRepoName
+} catch {
+    // do something
+}
+
+.NOTES
+A try catch should be used when calling Set-PlifyRepositoryPublicKey
+#>
+function Set-PlifyRepositoryPublicKey() {
     param(
         [Parameter(Mandatory=$true)] [string] $Name
     )
@@ -201,12 +353,32 @@ function Get-PlifyRepositoryPublicKey() {
     # extract the public key from the public cert
     & $openssl x509 -in "$certBaseName.crt" -pubkey -noout > "$certBaseName.key.public" 2>&1 | Out-Null
     if ($LASTEXITCODE -gt 0) {
-        throw "Failed to extract public key from certificate: $certBaseName.crt"
+        throw
     }
 
     Update-PlifyRepository -Name $Name -Thumbprint (Get-FileHash -Path "$certBaseName.key.public" -Algorithm SHA256).Hash | Out-Null
 }
 
+<#
+.SYNOPSIS
+Restores a previously backed up certificate for a plify repository
+
+.PARAMETER Name
+The name of the repository to restore the certificate for
+
+.PARAMETER Path
+the full path to the .PFX file that was previously backer up
+
+.PARAMETER Password
+The password to decrypt the PFX archive. This was set previously
+when backing up the certificate. See "Backup-PlifyRepositoryCertificate" 
+
+.PARAMETER Force
+use Force to overwrite the existing certificate for the given plify repository
+
+.NOTES
+'plify repo backupcert' is mapped here
+#>
 function Restore-PlifyRepositoryCertificate() {
     param(
         [Parameter(Mandatory=$true)] [string] $Name,
@@ -219,41 +391,75 @@ function Restore-PlifyRepositoryCertificate() {
     $certBaseName = "$certDir$($ds)$Name"
 
     if ( (Test-Path -Path $Path) -eq $False -or ($Path.EndsWith("pfx")) -eq $false) {
-        throw "Invalid PFX Path: file doesn't exist or is not a PFX file"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message InvalidPFXPath) )
     }
 
     # make sure we don't restore a certifacte over an existing one unless forced
     if ( (Test-Path -Path "$certBaseName.key.private") -eq $true -and $Force -eq $false) {
-        throw "Certificate already exists...skipping"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message PFXExists) )
     }
 
     & $openssl pkcs12 -in $Path -nocerts -nodes -passin pass:$Password | & $openssl pkcs8 -nocrypt -out "$certBaseName.key.private" 2>&1 | Out-Null
     if ($LASTEXITCODE -gt 0) {
-        throw "Error Restoring Private Key Certificate from PFX: $Path"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message ErrorRestorePrivateKey -Replacements @{Path=$Path}) )
     }
 
     & $openssl pkcs12 -in $Path -nokeys -clcerts -passin pass:$Password | & $openssl x509 -out "$certBaseName.crt" 2>&1 | Out-Null
     if ($LASTEXITCODE -gt 0) {
-        throw "Error Restoring Certificate from PFX: $Path"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message ErrorRestoreCertificate -Replacements @{Path=$Path}) )
     }
 
     & $openssl x509 -in "$certBaseName.crt" -pubkey -noout > "$certBaseName.key.public" | Out-Null
     if ($LASTEXITCODE -gt 0) {
-        throw "Error Restoring Public Key from PFX: $Path"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message ErrorRestorePublicKey -Replacements @{Path=$Path}) )
     }
 
-    Get-PlifyRepositoryPublicKey -Name $Name
+    try {
+        Set-PlifyRepositoryPublicKey -Name $Name
+    } catch {
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message ErrorExtractPublicKey -Replacements @{REPO=$Name}) )
+    }
 
-    Write-Output ""
-    Write-Output "Restored Certificate: $Path for repo: $Name"
-    Write-Output ""
-    return
+    return [PlifyReturn]::new(
+        [PlifyStatus]::OK, 
+        (Get-PlifyMessage -Module Repository -Message RestoredCertificate -Replacements @{Path=$Path;Name=$Name}) )
 }
 
+<#
+.SYNOPSIS
+returns the location of the global plify repository cache file
+#>
 function Get-PlifyRepositoryCacheFile() {
     return "$(PlifyConfiguration\Get-PlifyConfigurationDir -Scope 'Global')$($ds)repositorycache.json"
 }
 
+<#
+.SYNOPSIS
+Syncrhonizes the plify repository cache
+
+.DESCRIPTION
+Downloads latest inventory files from all enabled repositories
+and updates the local repository cache
+
+.PARAMETER Force
+By default plify will only update the repository cache only
+once per day. Use Force to override and force the update
+
+.NOTES
+'plify repo sync' is mapped here
+#>
 function Sync-PlifyRepository() {
     [CmdletBinding()]
     param (
@@ -313,6 +519,31 @@ function Sync-PlifyRepository() {
     Write-Debug " Update Process run time: $($end - $start)"
 }
 
+<#
+.SYNOPSIS
+Creates a new Plify Repository Certificate
+
+.DESCRIPTION
+Plify Signing Certificates are used to sign and validate
+plify repository inventory files. This creates a new
+signing certificate for a plify repository.
+
+.PARAMETER Name
+The name of the new repository
+
+.PARAMETER Days
+the number of days the certificate is valid for
+default is 10 years
+
+.PARAMETER KeySize
+The RSA keysize. Default is 4096
+
+.PARAMETER Force
+Use force to overwrite an existing certificate
+
+.NOTES
+'Plify repo newcert' is mapped here
+#>
 function New-PlifyRepositoryCertificate() {
     param(
         [Parameter(Mandatory=$true)] [string] $Name,
@@ -323,7 +554,9 @@ function New-PlifyRepositoryCertificate() {
 
     # only generate certs for existing repositories
     if ( $null -eq (Get-PlifyRepository -Name $Name) ) {
-        throw "Repository $Name doesn't exist, please create that first"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::WARNING, 
+            (Get-PlifyMessage -Module Repository -Message RepositoryNotExists -Replacements @{Name=$Name}) )
     }
 
     $openssl = Get-PlifyRepositoryOpenSSL
@@ -335,24 +568,35 @@ function New-PlifyRepositoryCertificate() {
 
     # make sure we don't overwrite certs unless forced
     if ( (Test-Path -Path "$certBaseName.key.private") -eq $true -and $Force -eq $false ) {
-        throw "Certificate for repository $Name already exists...skipping"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::WARNING, 
+            (Get-PlifyMessage -Module Repository -Message NoOverwritingCertificates -Replacements @{Name=$Name}) )
     }
 
     # we never regenerate certificates for plify default repo's
     if ($Name -eq "PlifyProd" -or $Name -eq "PlifyDev") {
-        throw "Can't generate certificates for default Plify Repositories!!"
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message NoCertificateGenForDefaultRepos) )
     }
 
     # generate the new private key and public cert
     & $openssl req -x509 -newkey rsa:$KeySize -keyout "$certBaseName.key.private" -out "$certBaseName.crt" -days $Days -nodes -subj $subject -config $config 2>&1 | Out-Null
     if ($LASTEXITCODE -gt 0) {
-        Write-Error "Failed to generate new certificates: $certBaseName[.crt|.key.private]" -ErrorAction SilentlyContinue
-        throw
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message CertificateGenFailed -Replacements @{CertName=$certBaseName}) )
     }
 
-    Get-PlifyRepositoryPublicKey -Name $Name
+    try {
+        Set-PlifyRepositoryPublicKey -Name $Name
+    } catch {
+        return [PlifyReturn]::new(
+            [PlifyStatus]::ERROR, 
+            (Get-PlifyMessage -Module Repository -Message ErrorExtractPublicKey -Replacements @{REPO=$Name}) )
+    }
 
-    Write-Output ""
-    Write-Output "Created Certificate for Repository: $Name"
-    Write-Output ""
+    return [PlifyReturn]::new(
+        [PlifyStatus]::OK, 
+        (Get-PlifyMessage -Module Repository -Message CertificateGenSuccess -Replacements @{Name=$Name}) )
 }

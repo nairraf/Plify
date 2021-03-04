@@ -4,10 +4,25 @@ $Script:PlifyMessages = @{
     eng = @{
         Default = "Plify Encountered an Error: "
         Repository = @{
-            RepositoryNotExists = "Repository __NAME__ doesn't exist, please create that first"
-            CertificateGenFailed = "Failed to generate new certificates: __CERTNAME__[.crt|.key.private]"
+            AddRepositorySuccess = "Added New Plify Repository: __NAME__"
+            BackupFileExists = "BackupFile: __FILEPATH__ already exists...skipping"
+            BackupFailed = "Failed backingup certificate to __FILEPATH__"
+            BackupSuccess = "BackupFile: __FILEPATH__ created succesfully"
+            CertificateGenSuccess = "Created Certificate for Repository: __NAME__"
+            CertificateGenFailed = "Failed to generate new certificate: __CERTNAME__.[crt|key.private|key.public]"
+            ErrorCertFilesNotFound = "Certificate files not found for repository: __NAME__"
+            ErrorRestoreCertificate = "Error Restoring Certificate from PFX: __PATH__"
+            ErrorRestorePrivateKey = "Error Restoring Private Key Certificate from PFX: __PATH__"
+            ErrorRestorePublicKey = "Error Restoring Public Key from PFX: __PATH__"
+            ErrorExtractPublicKey = "Error Extracting Public Key for repository: __REPO__"
+            InvalidPFXPath = "Invalid PFX: file doesn't exist or is not a PFX file"
             NoCertificateGenForDefaultRepos = "Can't generate certificates for default Plify Repositories!!"
             NoOverwritingCertificates = "Certificate for repository __NAME__ already exists...skipping"
+            PFXExists = "PFX Archive already exists...skipping"
+            RemoveRepositorySuccess = "Removed Plify Repository: __NAME__"
+            RepositoryNotExists = "Repository __NAME__ doesn't exist, please create that first"
+            RestoredCertificate = "Restored Certificate: __PATH__ for repo: __NAME__"
+            UpdatedRepo = "Updated Repository: __NAME__"
         }
     }
 }
