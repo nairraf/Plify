@@ -123,15 +123,10 @@ try {
         $ret = & $ModuleFound\$ActionFound @extraFlags
     }
     
-    # see if $ret is a list or a single entity and get the nextcall value
-    if ($ret.Count -gt 1) {
-        # $ret is a list - use the first element's next call
-        $nextCall = $ret[0].NextCall
-    } else {
-        # ret is not an array, see if it has a next call
-        $nextCall = $ret.NextCall
-    }
-    
+    # a single item in powershell can also be accessed through 0 index
+    # use this shortcut which works with arrays/lists and single objects
+    $nextCall = $ret[0].NextCall
+
     # if we don't have a next call, then just output $ret
     # otherwise we display ret and call the next call
     if ( $null -eq $nextCall ) {
@@ -156,13 +151,13 @@ try {
         }
     }
 
-    if ($ret.ExitCode -gt 0) {
+    if ($ret.ExitCode[0] -gt 0) {
         if ($error.count -gt 0) {
             Write-PlifyErrors
         }
     }
 
-    exit $ret.ExitCode
+    exit $ret.ExitCode[0]
 } catch {
     Write-PlifyErrors
     exit 100
