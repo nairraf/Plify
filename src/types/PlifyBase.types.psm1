@@ -5,7 +5,7 @@ enum PlifyStatus {
     ERROR = 2
 }
 
-Class PlifyNextCall {
+class PlifyNextCall {
     [string] $Module
     [string] $Action
     [hashtable] $ActionParams
@@ -28,7 +28,7 @@ Class PlifyNextCall {
     }
 }
 
-Class PlifyReturn {
+class PlifyReturn {
     [int] $ExitCode
     [PlifyStatus] $Status
     [string] $Message
