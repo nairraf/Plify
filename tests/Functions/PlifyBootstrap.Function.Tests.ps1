@@ -1,5 +1,5 @@
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.0.0" }
-using module .\..\..\src\types\PlifyReturn.psm1
+using module .\..\..\src\types\PlifyBase.types.psm1
 BeforeAll {
     # we do not do anything in this before all, as we are testing the bootstrap process, not using it yet
 }

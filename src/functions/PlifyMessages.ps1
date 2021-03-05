@@ -22,6 +22,8 @@ $Script:PlifyMessages = @{
             RemoveRepositorySuccess = "Removed Plify Repository: __NAME__"
             RepositoryNotExists = "Repository __NAME__ doesn't exist, please create that first"
             RestoredCertificate = "Restored Certificate: __PATH__ for repo: __NAME__"
+            SyncAlreadyRan = "Cache file has already been updated within the last day, skipping. use: '@{Force=`$true}' to force an update now"
+            SyncSuccess = "Synchronized: __REPOS__"
             UpdatedRepo = "Updated Repository: __NAME__"
         }
     }

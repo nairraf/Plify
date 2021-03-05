@@ -1,5 +1,6 @@
 #Requires -Modules powershell-yaml
-using module .\..\..\..\types\PlifyReturn.psm1
+using module .\..\..\..\types\PlifyBase.types.psm1
+using module .\..\..\..\types\PlifyRepository.types.psm1
 
 # import all our external module functions into the modules current scope on module load
 foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Recurse)) {  
@@ -74,7 +75,7 @@ function Get-PlifyRepository() {
 
     foreach ($repo in ($repos.Repositories.Keys | Sort-Object)) {
         $Repositories += [PSCustomObject]@{
-            ExitCode = [PlifyStatus]::OK
+            ExitCode = [int][PlifyStatus]::ERROR
             PSTypeName = "Plify.Repository"
             Name = $repo
             Enabled = $repos.Repositories.$repo.enabled
@@ -466,35 +467,31 @@ function Sync-PlifyRepository() {
         [Parameter(Mandatory=$false)] [switch] $Force
     )
 
+    # by default we only run once per 24 hour window
     $cacheFile = Get-PlifyRepositoryCacheFile
     if ( (Test-Path -Path $cacheFile) -and $Force -eq $false) {
         $lastUpdate = (Get-Item -Path $cacheFile).LastWriteTimeUtc
         $currentTime = Get-Date -AsUTC
         if ($lastUpdate -gt $currentTime.AddDays(-1)) {
-            Write-Output "Cache file has already been updated within the last day, skipping"
-            Write-Output "  use: '@{Force=`$true}' to force an update now"
-            return
+            return [PlifyReturn]::new(
+                [PlifyStatus]::WARNING, 
+                (Get-PlifyMessage -Module Repository -Message SyncAlreadyRan) )
         }
     }
 
     $EnabledRepos = Get-PlifyRepository | Where-Object { $_.Enabled -eq $true }
+
     $cache = @{}
     $start = Get-Date
     $r = 0
     foreach ($repo in $EnabledRepos) {
-        # the sync process is very quick that write-progress just disapears too quickly to be useful.
-        # using write-output to just display console messages for feedback
         Write-Progress -Activity "Syncrhonizing Plify Repositories" -Status "Processing $($r+1) of $($EnabledRepos.Count)" -PercentComplete (($r)/$EnabledRepos.Count*100) -CurrentOperation "Downloading Inventory: $($repo.Name)"
         
         $cache[$repo.Name] = @{}
-        Write-Output "Processing Repository: $($repo.Name)  ($($repo.URL))"
-        Write-Output "  Downloading Inventory"
         $indexContent = PlifyWeb\Get-PlifyWebContent -Url "$($repo.URL)/inventory.json"
         Write-Progress -Activity "Syncrhonizing Plify Repositories" -Status "Processing $($r+1) of $($EnabledRepos.Count)" -PercentComplete (($r)/$EnabledRepos.Count*100) -CurrentOperation "Updating Inventory: $($repo.Name)"
         if ( -not ([string]::IsNullOrEmpty($indexContent))) {
-            Write-Output "  Reading Inventory"
             $index = ($indexContent | ConvertFrom-Json -Depth 5)
-            Write-Output "  Processing Inventory"
             $p = 0
             $numImages = ($index | Get-Member -MemberType NoteProperty).Count
             foreach ($package in $index | Get-Member -MemberType NoteProperty){
@@ -512,11 +509,14 @@ function Sync-PlifyRepository() {
         $r += 1
     }
     Write-Progress -Activity "Syncrhonizing Plify Repositories" -Status "Completed" -PercentComplete 100 -Completed
-    Write-Output "Updating Cache"
     $cache | ConvertTo-Json -Depth 5 -Compress | Out-File -FilePath $cacheFile
     $end = Get-Date
-    Write-Output "Complete"
-    Write-Debug " Update Process run time: $($end - $start)"
+   
+    return [PlifyRepoSync]::new(
+        [PlifyStatus]::OK,
+        (Get-PlifyMessage -Module Repository -Message SyncSuccess -Replacements @{Repos="$($EnabledRepos.Name -join ", ")"}),
+        (($end - $start).TotalSeconds.ToString("#.###"))
+    )
 }
 
 <#
