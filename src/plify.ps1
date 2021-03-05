@@ -123,15 +123,18 @@ try {
         $ret = & $ModuleFound\$ActionFound @extraFlags
     }
     
-    # see if we have a next call or not
-    # if there is no NextCall property in the object than this will throw, which we can safely catch and set that there is no next call
-    try {
-        $NextCallDetected = ($ret.NextCall).GetType().Name -eq "PlifyNextCall"
-    } catch {
-        $NextCallDetected = $false
+    # see if $ret is a list or a single entity and get the nextcall value
+    if ($ret.Count -gt 1) {
+        # $ret is a list - use the first element's next call
+        $nextCall = $ret[0].NextCall
+    } else {
+        # ret is not an array, see if it has a next call
+        $nextCall = $ret.NextCall
     }
-
-    if ( $NextCallDetected -eq $false) {
+    
+    # if we don't have a next call, then just output $ret
+    # otherwise we display ret and call the next call
+    if ( $null -eq $nextCall ) {
         $ret
     } else {
         Write-Output ""

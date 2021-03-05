@@ -3,9 +3,17 @@ function Global:Write-PlifyErrors() {
     [console]::ForegroundColor = "Red"
     ""
     "Errors Encountered:"
+    "-------------------"
     [console]::ForegroundColor = "Yellow"
     foreach ($e in $error) {
-        "  $($e.ToString())"
+        $lineNum = $e.InvocationInfo.ScriptLineNumber
+        $spacer = ""
+        while ($spacer.Length -lt $lineNum.Length) {
+            $spacer += " "
+        }
+        "  line #$($lineNum): $($e.InvocationInfo.Line.Trim())"
+        "       $($spacer)msg: $($e.Exception.Message)"
+        " "
     }
     [console]::ForegroundColor = $ogForeground
     ""
