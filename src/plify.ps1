@@ -165,5 +165,5 @@ try {
     exit $ret.ExitCode
 } catch {
     Write-PlifyErrors
-    exit 1
+    exit 100
 }
