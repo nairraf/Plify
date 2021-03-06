@@ -97,55 +97,55 @@ function Write-PlifyConsoleHelpText() {
             $helpTxt = Write-PlifyConsole -TableData $aliasesHelp -ReturnText $true -LeftPadding 4
             $line = $line.Replace("__MODULEALIASES__", $helpTxt)
         }
-        if ($line.Contains("__PLIFYSHORTCUTS__")) {
-            $shortcutHelp = @{
-                Headers = @("Shortcut","Equivalent Cmd","Description")
+        if ($line.Contains("__PLIFYROUTES__")) {
+            $routeHelp = @{
+                Headers = @("Route","Equivalent Cmd","Description")
                 Rows = @()
             }
-            foreach ($shortcut in $PlifyShortcuts.keys | Sort-Object) {
-                $targetShortcut = $shortcut
-                if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
-                       $targetShortcut = $PlifyShortcuts.$shortcut.Alias
-                       $equivalentTxt = "Alias for: $targetShortcut"
+            foreach ($route in $PlifyRoutes.keys | Sort-Object) {
+                $targetroute = $route
+                if ($null -ne $PlifyRoutes.$route.Alias) {
+                       $targetroute = $PlifyRoutes.$route.Alias
+                       $equivalentTxt = "Alias for: $targetroute"
                 } else {
-                    $equivalentTxt = $PlifyShortcuts.$targetShortcut.Equivalent
+                    $equivalentTxt = $PlifyRoutes.$targetroute.Equivalent
                 }
-                # do not display the shortcut if it's set to hidden
+                # do not display the route if it's set to hidden
                 # we use the not to catch null's and/or hide = False conditions
-                if (-not ($PlifyShortcuts.$shortcut.Hide -eq $true)) {
+                if (-not ($PlifyRoutes.$route.Hide -eq $true)) {
 
-                    $shortcutHelp.Rows += , ($shortcut, $equivalentTxt, $PlifyShortcuts.$targetShortcut.Description)
+                    $routeHelp.Rows += , ($route, $equivalentTxt, $PlifyRoutes.$targetroute.Description)
                 }
             }
-            $helpTxt = Write-PlifyConsole -TableData $shortcutHelp -ReturnText $true -LeftPadding 4
-            $line = $line.Replace("__PLIFYSHORTCUTS__", $helpTxt)
+            $helpTxt = Write-PlifyConsole -TableData $routeHelp -ReturnText $true -LeftPadding 4
+            $line = $line.Replace("__PLIFYROUTES__", $helpTxt)
         }
-        if ($line.Contains("__MODULESHORTCUTS__")) {
+        if ($line.Contains("__MODULEROUTES__")) {
             $moduleLine = $line.Split(":")
             if ($moduleLine.Count -eq 2) {
-                $shortcutHelp = @{
-                    Headers = @("Shortcut","Equivalent Cmd","Description")
+                $routeHelp = @{
+                    Headers = @("Route","Equivalent Cmd","Description")
                     Rows = @()
                 }
                 $module = $moduleLine[1]
-                foreach ($shortcut in $PlifyShortcuts.Keys | Sort-Object) {
-                    $targetShortcut = $shortcut
-                    if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
-                        $targetShortcut = $PlifyShortcuts.$shortcut.Alias
-                        $equivalentTxt = "Alias for: $targetShortcut"
+                foreach ($route in $PlifyRoutes.Keys | Sort-Object) {
+                    $targetroute = $route
+                    if ($null -ne $PlifyRoutes.$route.Alias) {
+                        $targetroute = $PlifyRoutes.$route.Alias
+                        $equivalentTxt = "Alias for: $targetroute"
                     } else {
-                        $equivalentTxt = $PlifyShortcuts.$targetShortcut.Equivalent
+                        $equivalentTxt = $PlifyRoutes.$targetroute.Equivalent
                     }
-                    if ($PlifyShortcuts.$targetShortcut.Module -eq $module) {
-                        # do not display the shortcut if it's set to hidden
+                    if ($PlifyRoutes.$targetroute.Module -eq $module) {
+                        # do not display the route if it's set to hidden
                         # we use the not to catch null's and/or hide = False conditions
-                        if (-not ($PlifyShortcuts.$shortcut.Hide -eq $true)) {
-                            $shortcutHelp.Rows += , ($shortcut, $equivalentTxt, $PlifyShortcuts.$targetShortcut.Description)
+                        if (-not ($PlifyRoutes.$route.Hide -eq $true)) {
+                            $routeHelp.Rows += , ($route, $equivalentTxt, $PlifyRoutes.$targetroute.Description)
                         }
                     }
                 }
-                $helpTxt = Write-PlifyConsole -TableData $shortcutHelp -ReturnText $true -LeftPadding 4
-                $line = $line.Replace("__MODULESHORTCUTS__:$module", $helpTxt)
+                $helpTxt = Write-PlifyConsole -TableData $routeHelp -ReturnText $true -LeftPadding 4
+                $line = $line.Replace("__MODULEROUTES__:$module", $helpTxt)
             }
         }
         if ($line.Contains("__REMOVEALIASES__")) {

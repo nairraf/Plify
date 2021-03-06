@@ -600,3 +600,24 @@ function New-PlifyRepositoryCertificate() {
         [PlifyStatus]::OK, 
         (Get-PlifyMessage -Module Repository -Message CertificateGenSuccess -Replacements @{Name=$Name}) )
 }
+
+<#
+.SYNOPSIS
+Builds the inventory for a plify repository
+
+.DESCRIPTION
+Creates and signs a plify repository inventory file
+Requires the Repositories Private key
+
+.PARAMETER Name
+The name of the repository to build the inventory for
+
+.NOTES
+'plify repo build' is mapped here
+#>
+function Build-PlifyRepositoryInventory() {
+    param(
+        [Parameter(Mandatory=$true)] [string] $Name
+    )
+    
+}

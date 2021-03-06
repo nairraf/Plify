@@ -33,8 +33,8 @@
 
 __MODULEALIASES__
 
-# Availabe Shortcut Commands
-    Shortcuts are aliases for modules and actions. 
-    Below are the available shortcuts:
+# Availabe Routes
+  Routes take the form of 'plify <route> [ @{ Param1=Value1; Param2=Value2; [...] } ]'
+  The Parameters are sent to the corresponding action that the route points to
 
-__PLIFYSHORTCUTS__
+__PLIFYROUTES__

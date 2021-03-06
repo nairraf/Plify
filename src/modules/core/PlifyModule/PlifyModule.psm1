@@ -28,8 +28,8 @@ $DefaultModuleHelpContents = @'
     Action      Action Parameters               Description
     ------      -----------------               -----------
 
-## Available Shortcuts
-__MODULESHORTCUTS__:Plify<ModuleName>
+## Available Routes
+__MODULEROUTES__:Plify<ModuleName>
 '@
 
 $DefaultModuleActionHelpContents = @'

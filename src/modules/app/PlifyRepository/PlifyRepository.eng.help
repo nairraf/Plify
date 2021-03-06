@@ -18,5 +18,5 @@
                       NewName
     Sync            Force                            Synchronizes repository indexes
 
-## Available Shortcuts
-__MODULESHORTCUTS__:PlifyRepository
+## Available Routes
+__MODULEROUTES__:PlifyRepository
