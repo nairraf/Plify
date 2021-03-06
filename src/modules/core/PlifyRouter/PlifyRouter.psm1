@@ -33,7 +33,8 @@ function Get-PlifyModuleAction() {
 
 function Build-PlifyModuleName() {
     param (
-        [Parameter(Mandatory=$true)] [string] $ModuleName
+        [Parameter(Mandatory=$true)] [string] $ModuleName,
+        [Parameter(Mandatory=$false)] [bool] $PlifyQualify = $true
     )
 
     foreach ($key in $PlifyModuleAliases.Keys) {
@@ -42,7 +43,13 @@ function Build-PlifyModuleName() {
         }
     }
 
-    return "Plify$($ModuleName)"
+    if ($PlifyQualify) {
+        $FullModuleName = "Plify$($ModuleName)"
+    } else {
+        $FullModuleName = $ModuleName
+    }
+
+    return $FullModuleName
 }
 
 function Build-PlifyActionName() {

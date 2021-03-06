@@ -16,6 +16,7 @@ $Global:PlifyActionMapping = @{
     "Remove" = @("delete","del","remove","rm")
     "Update" = @("update","modify","mod","upd")
     "Sync" = @("sync","synchronize","pull")
+    "Build" = @("build", "generate","gen")
 }
 
 $Global:PlifyRoutes = @{
@@ -36,8 +37,11 @@ $Global:PlifyRoutes = @{
         Equivalent="None. Shortcut Only"
         Hide=$true
     }
-    "repo backupcert" = @{
-        Alias="repository backupcert"
+    "repository build" = @{
+        Module="PlifyRepository"
+        Action="Build-PlifyRepositoryInventory"
+        Description="Builds repository inventory file"
+        Equivalent="None. Shortcut Only"
         Hide=$true
     }
     "rl" = @{
@@ -53,19 +57,11 @@ $Global:PlifyRoutes = @{
         Equivalent="None. Shortcut Only"
         Hide=$true
     }
-    "repo newcert" = @{
-        Alias="repository newcert"
-        Hide=$true
-    }
     "repository restorecert" = @{
         Module="PlifyRepository"
         Action="Restore-PlifyRepositoryCertificate"
         Description="Restore repository signing certificate"
         Equivalent="None. Shortcut Only"
-        Hide=$true
-    }
-    "repo restorecert" = @{
-        Alias="repository restorecert"
         Hide=$true
     }
 }

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$false, Position=0)] [string] $Module,
-    [Parameter(Mandatory=$false, Position=1)] $Action, # we can't force a type here because of shortcuts. this could be string or hastable
+    [Parameter(Mandatory=$false, Position=1)] $Action, # we can't force a type here because of routes. this could be string or hastable
     [Parameter(Mandatory=$false, Position=2)] [hashtable] $ActionParams = @{},
     [Parameter(Mandatory=$false)] [switch] $Help,
     [Parameter(Mandatory=$false)] [switch] $Flush
@@ -32,35 +32,50 @@ $ActionParamsString = Build-PlifyStringFromHash $ActionParams
 
 # route requests via naming convention
 if ( -not [string]::IsNullOrEmpty($Module) ) {
-    # see if we have a shortcut registered:
+    # see if we have a matching module name for the module specified
+    $ModuleMatch = PlifyRouter\Build-PlifyModuleName -ModuleName $Module -PlifyQualify $false
+    if ($null -ne $ModuleMatch) {
+        # we try and resolve module and action aliases and re-assign the real module/action names
+        # eases lookups in PlifyRoutes as aliases are resolved
+        
+        $Module = $ModuleMatch
+        if ($null -ne $Action -and $Action.GetType().Name -eq "string") {
+            $ActionMatch = PlifyRouter\Get-PlifyVerb $Action
+            if ($null -ne $ActionMatch) {
+                $Action = $ActionMatch
+            }
+        }
+    } 
+
+    # see if we have a route registered:
     $PlifyRoute = $false
-    # build our plify shortcut
-    $shortcut = $Module
+    # build our plify route
+    $route = $Module
     if (-not [string]::IsNullOrEmpty($Action)) {
         if ($Action.GetType().Name -eq "Hashtable") {
             $ActionParams = $Action
             $Action = ""
         } else {
-            $shortcut = "$Module $Action"
+            $route = "$Module $Action"
         }
-    } 
+    }
 
-    # plify shortcuts can overide/point to any module/action
-    # we loop through all available shortcuts and see if we find a match
+    # plify routes can overide/point to any module/action
+    # we loop through all available routes and see if we find a match
     # if we find a match we assign the module/action which will cause plify
     # bypass the Build-PlifyModuleName, and Build-PlifyActionName functions
     # which Plify uses to try and detect the correct module and actions
-    if ($PlifyRoutes.Keys -contains $shortcut) {
-        if ($null -ne $PlifyRoutes.$shortcut.Alias) {
-            $shortcut = $PlifyRoutes.$shortcut.Alias
+    if ($PlifyRoutes.Keys -contains $route) {
+        if ($null -ne $PlifyRoutes.$route.Alias) {
+            $route = $PlifyRoutes.$route.Alias
         }
-        $ModuleName = $PlifyRoutes.$shortcut.Module
-        $ActionName = $PlifyRoutes.$shortcut.Action
-        # if the shortcut specified actions, merge them in to the main
+        $ModuleName = $PlifyRoutes.$route.Module
+        $ActionName = $PlifyRoutes.$route.Action
+        # if the route specified actions, merge them in to the main
         # ActionParams hashtable
-        if ($null -ne $PlifyRoutes.$shortcut.ActionParams) {
-            foreach ($Action in $PlifyRoutes.$shortcut.ActionParams.Keys) {
-                $ActionParams.$Action = $PlifyRoutes.$shortcut.ActionParams.$Action
+        if ($null -ne $PlifyRoutes.$route.ActionParams) {
+            foreach ($ap in $PlifyRoutes.$route.ActionParams.Keys) {
+                $ActionParams.$ap = $PlifyRoutes.$route.ActionParams.$ap
             }
         }
         Write-Debug "Plify Shorcut Detected, Redirecting to Module: $ModuleName, Action: $ActionName"
@@ -124,7 +139,7 @@ try {
     }
     
     # a single item in powershell can also be accessed through 0 index
-    # use this shortcut which works with arrays/lists and single objects
+    # use this route which works with arrays/lists and single objects
     $nextCall = $ret[0].NextCall
 
     # if we don't have a next call, then just output $ret

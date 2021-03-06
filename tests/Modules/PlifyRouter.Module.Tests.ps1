@@ -28,6 +28,9 @@ Describe 'Get-PlifyVerb Returns Proper Verb' {
         @{ Name = 'sync'; Expected = 'Sync' }
         @{ Name = 'synchronize'; Expected = 'Sync' }
         @{ Name = 'pull'; Expected = 'Sync' }
+        @{ Name = 'build'; Expected = 'Build' }
+        @{ Name = 'gen'; Expected = 'Build' }
+        @{ Name = 'generate'; Expected = 'Build' }
     ) {
         param ($Name, $Expected)
 

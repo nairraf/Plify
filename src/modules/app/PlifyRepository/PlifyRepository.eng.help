@@ -9,6 +9,7 @@
     Action          Action Parameters               Description
     ------          -----------------               -----------
     BackupCert      Name,Path,Force,Password        Backup an existing repository signing certificate
+    Build           Name                            Builds a repository inventory file
     Get             Name                            Get the current list of repositories
     New             Name,Enabled,Description,URL    Adds a new plify repository
     NewCert         Name,Days,KeySize,Force         Creates a new repository signing certificate
@@ -16,7 +17,7 @@
     RestoreCert     Name,Path,Force,Password        Restores a repository signing certificate
     Update          Name,Enabled,Description,URL,   Updates a specific repository configuration
                       NewName
-    Sync            Force                            Synchronizes repository indexes
+    Sync            Force                           Synchronizes repository indexes
 
 ## Available Routes
 __MODULEROUTES__:PlifyRepository
