@@ -33,7 +33,7 @@ $ActionParamsString = Build-PlifyStringFromHash $ActionParams
 # route requests via naming convention
 if ( -not [string]::IsNullOrEmpty($Module) ) {
     # see if we have a shortcut registered:
-    $plifyShortcut = $false
+    $PlifyRoute = $false
     # build our plify shortcut
     $shortcut = $Module
     if (-not [string]::IsNullOrEmpty($Action)) {
@@ -50,24 +50,24 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
     # if we find a match we assign the module/action which will cause plify
     # bypass the Build-PlifyModuleName, and Build-PlifyActionName functions
     # which Plify uses to try and detect the correct module and actions
-    if ($PlifyShortcuts.Keys -contains $shortcut) {
-        if ($null -ne $PlifyShortcuts.$shortcut.Alias) {
-            $shortcut = $PlifyShortcuts.$shortcut.Alias
+    if ($PlifyRoutes.Keys -contains $shortcut) {
+        if ($null -ne $PlifyRoutes.$shortcut.Alias) {
+            $shortcut = $PlifyRoutes.$shortcut.Alias
         }
-        $ModuleName = $PlifyShortcuts.$shortcut.Module
-        $ActionName = $PlifyShortcuts.$shortcut.Action
+        $ModuleName = $PlifyRoutes.$shortcut.Module
+        $ActionName = $PlifyRoutes.$shortcut.Action
         # if the shortcut specified actions, merge them in to the main
         # ActionParams hashtable
-        if ($null -ne $PlifyShortcuts.$shortcut.ActionParams) {
-            foreach ($Action in $PlifyShortcuts.$shortcut.ActionParams.Keys) {
-                $ActionParams.$Action = $PlifyShortcuts.$shortcut.ActionParams.$Action
+        if ($null -ne $PlifyRoutes.$shortcut.ActionParams) {
+            foreach ($Action in $PlifyRoutes.$shortcut.ActionParams.Keys) {
+                $ActionParams.$Action = $PlifyRoutes.$shortcut.ActionParams.$Action
             }
         }
         Write-Debug "Plify Shorcut Detected, Redirecting to Module: $ModuleName, Action: $ActionName"
-        $plifyShortcut = $true
+        $PlifyRoute = $true
     }
 
-    if (-not $plifyShortcut) {
+    if (-not $PlifyRoute) {
         $ModuleName = PlifyRouter\Build-PlifyModuleName -ModuleName $Module
     }
 
@@ -77,8 +77,8 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
     if ($null -ne $ModuleFound) {
         Write-Debug "Found Module: $($ModuleFound.Name)"
         
-        if ( -not [string]::IsNullOrEmpty($Action) -or $plifyShortcut -eq $true) {
-            if (-not $plifyShortcut) {
+        if ( -not [string]::IsNullOrEmpty($Action) -or $PlifyRoute -eq $true) {
+            if (-not $PlifyRoute) {
                 $ActionName = PlifyRouter\Build-PlifyActionName -Module $ModuleFound -ActionName $Action
             }
             Write-Debug "Detected Action Name: $ActionName"
