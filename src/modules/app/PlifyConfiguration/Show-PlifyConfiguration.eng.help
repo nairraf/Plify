@@ -1,0 +1,16 @@
+
+### plify configuration show help
+    Displays the local (default) or global config depending on what Scope is set to
+
+### Valid Action Parameters
+    Scope="Local"|"Global"                  - by default scope is set to local
+
+#### Examples
+    plify config show                       - displays the local plify config
+    plify config show @{ Scope="Local" }
+
+    plify config show @{ Scope="Global" }   - displays the global plify config
+
+#### Action Aliases
+    these aliases can be used instead of show:
+        __GETALIASES__

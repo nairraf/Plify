@@ -1,5 +1,5 @@
 
-### plify Repository get help
+### plify Repository show help
     retreives the list of plify repositories
 
 ### Valid Action Parameters
@@ -10,8 +10,8 @@
                                       all repositories are retrieved.
 
 #### Examples
-    plify Repository get            - displays Repository list
+    plify Repository show           - displays Repository list
 
 #### Action Aliases
-    these aliases can be used instead of get:
+    these aliases can be used instead of show:
         __GETALIASES__

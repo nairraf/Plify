@@ -2,9 +2,9 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>Plify.Repository</Name>
+            <Name>PlifyRepository</Name>
             <ViewSelectedBy>
-                <TypeName>Plify.Repository</TypeName>
+                <TypeName>PlifyRepository</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <AutoSize />

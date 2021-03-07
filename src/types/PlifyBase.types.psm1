@@ -28,9 +28,22 @@ class PlifyNextCall {
     }
 }
 
-class PlifyReturn {
+class Plify {
     [int] $ExitCode
     [PlifyStatus] $Status
+    PlifyReturnBasic() {
+        $this.Status = [PlifyStatus]::OK
+        $this.ExitCode = [int][PlifyStatus]::OK
+    }
+    PlifyReturnBasic(
+        [PlifyStatus] $status
+    ) {
+        $this.ExitCode = [int]$status
+        $this.Status = $status
+    }
+}
+
+class PlifyReturn : Plify {
     [string] $Message
     [PlifyNextCall] $NextCall
     PlifyReturn(){}

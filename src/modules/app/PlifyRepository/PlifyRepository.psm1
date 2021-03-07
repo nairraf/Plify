@@ -43,13 +43,6 @@ List all the repositories in the global configuration
 .PARAMETER Name
 By default all repositories are listed. you can filter
 the results using the name parameter. Wildcards are supported
-
-.EXAMPLE
-plify repo ls @{Name=*prod*}
-    # lists all repositories with prod in their name
-
-.NOTES
-'plify repo get' is mapped here
 #>
 function Get-PlifyRepository() {
     param (
@@ -74,18 +67,45 @@ function Get-PlifyRepository() {
     $Repositories = @()
 
     foreach ($repo in ($repos.Repositories.Keys | Sort-Object)) {
-        $Repositories += [PSCustomObject]@{
-            ExitCode = [int][PlifyStatus]::ERROR
-            PSTypeName = "Plify.Repository"
-            Name = $repo
-            Enabled = $repos.Repositories.$repo.enabled
-            Description = $repos.Repositories.$repo.description
-            URL = $repos.Repositories.$repo.url
-            Thumbprint = $repos.Repositories.$repo.thumbprint
-        }
+        $r = [PlifyRepository]::new()
+        $r.Name = $repo
+        $r.Enabled = $repos.Repositories.$repo.enabled
+        $r.Description = $repos.Repositories.$repo.description
+        $r.URL = $repos.Repositories.$repo.url
+        $r.Thumbprint = $repos.Repositories.$repo.thumbprint
+        $Repositories += $r
     }
 
     return $Repositories
+}
+
+<#
+.SYNOPSIS
+Displays the list of repositories to the user
+
+.DESCRIPTION
+Adds ExitCode status to the repos and displays to the user
+
+.PARAMETER Name
+be default it will return all repositories.
+Name can be used to return specific repositories
+wildcard (*) is supported
+
+.EXAMPLE
+plify repo ls @{Name=*prod*}
+    # lists all repositories with prod in their name
+
+.NOTES
+'plify repo ls' is mapped here
+#>
+function Show-PlifyRepository() {
+    param (
+        [Parameter(Mandatory=$false)] [string] $Name = ""
+    )
+
+    $repos = Get-PlifyRepository -Name $Name
+    $repos.ExitCode = [int][PlifyStatus]::OK
+    return $repos
 }
 
 <#
@@ -619,5 +639,5 @@ function Build-PlifyRepositoryInventory() {
     param(
         [Parameter(Mandatory=$true)] [string] $Name
     )
-    
+
 }

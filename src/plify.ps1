@@ -45,7 +45,7 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
                 $Action = $ActionMatch
             }
         }
-    } 
+    }
 
     # see if we have a route registered:
     $PlifyRoute = $false
@@ -94,10 +94,10 @@ if ( -not [string]::IsNullOrEmpty($Module) ) {
         
         if ( -not [string]::IsNullOrEmpty($Action) -or $PlifyRoute -eq $true) {
             if (-not $PlifyRoute) {
-                $ActionName = PlifyRouter\Build-PlifyActionName -Module $ModuleFound -ActionName $Action
+                $ActionName = PlifyRouter\Build-PlifyActionName -Module $ModuleFound -ActionName $Action @extraFlags
             }
             Write-Debug "Detected Action Name: $ActionName"
-            $ActionFound = PlifyRouter\Get-PlifyModuleAction -Module $ModuleFound -ActionName $ActionName
+            $ActionFound = PlifyRouter\Get-PlifyModuleAction -Module $ModuleFound -ActionName $ActionName @extraFlags
             if ($null -ne $ActionFound) {
                 Write-Debug "Found Action: $($ActionFound.Name)"
             }
@@ -138,8 +138,6 @@ try {
         $ret = & $ModuleFound\$ActionFound @extraFlags
     }
     
-    # a single item in powershell can also be accessed through 0 index
-    # use this route which works with arrays/lists and single objects
     $nextCall = $ret[0].NextCall
 
     # if we don't have a next call, then just output $ret
@@ -166,7 +164,7 @@ try {
         }
     }
 
-    if ($ret.ExitCode[0] -gt 0) {
+    if ( $null -ne $ret.ExitCode -and $ret.ExitCode[0] -gt 0 ) {
         if ($error.count -gt 0) {
             Write-PlifyErrors
         }

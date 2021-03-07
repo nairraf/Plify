@@ -10,7 +10,8 @@ $Global:PlifyModuleAliases = @{
 }
 
 $Global:PlifyActionMapping = @{
-    "Get" = @("list","show","ls","get")
+    "Show" = @("list","show","ls")
+    "Get" = @("get")
     "New" = @("new","add","create")
     "Initialize" = @("init","initialize")
     "Remove" = @("delete","del","remove","rm")
@@ -24,7 +25,7 @@ $Global:PlifyRoutes = @{
     "gc" = @{Alias="globalConfig"}
     "globalConfig" = @{
         Module="PlifyConfiguration"
-        Action="Get-PlifyConfiguration"
+        Action="Show-PlifyConfiguration"
         Description="Displays Global Plify Configuration"
         Equivalent="plify config get @{Scope='Global'}"
         ActionParams=@{Scope="Global"}

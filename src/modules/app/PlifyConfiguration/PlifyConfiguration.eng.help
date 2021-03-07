@@ -14,10 +14,8 @@
     init           Scope                        initilizes the Plify Configuration directory
     initialize                                  depending on scope
 
-    get            Scope                        Display the entire configuration depending on Scope
-    show
-    ls
-    list
+    show           Scope                        Display the entire configuration depending on Scope
+
 
 ## Available Routes
 __MODULEROUTES__:PlifyConfiguration

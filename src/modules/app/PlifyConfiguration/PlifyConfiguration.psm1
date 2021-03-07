@@ -1,4 +1,5 @@
 #Requires -Modules powershell-yaml
+using module .\..\..\..\types\PlifyBase.types.psm1
 
 # import all our external module functions into the modules current scope on module load
 foreach ($file in (Get-ChildItem -Path "$PSScriptRoot$($ds)*.ps1" -Recurse)) {  
@@ -103,9 +104,19 @@ function Get-PlifyConfiguration() {
         }
 
         return $content
-    } else {
-        return "Config File Not found: $configFile"
     }
+}
+
+function Show-PlifyConfiguration() {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)] [string] $Scope = "Local",
+        [Parameter(Mandatory=$false)] [string] $RootElement = $null
+    )
+
+    Get-PlifyConfiguration -Scope $Scope -RootElement $RootElement
+
+    return [Plify]::new()
 }
 
 function Set-PlifyGlobalConfig() {
@@ -126,5 +137,3 @@ function Set-PlifyGlobalConfig() {
 
     ConvertTo-Yaml -Data $config -OutFile $configFile -Force
 }
-
-Export-ModuleMember -Function Get-PlifyConfigurationFromYaml,Initialize-PlifyConfiguration,Get-PlifyConfigurationDir,Get-PlifyConfiguration,Set-PlifyGlobalConfig

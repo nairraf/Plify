@@ -11,3 +11,12 @@ class PlifyRepoSync:PlifyReturn {
         $this.Seconds = $seconds
     }
 }
+
+class PlifyRepository:Plify {
+    [string] $Name
+    [bool] $Enabled
+    [string] $Description
+    [string] $URL
+    [string] $Thumbprint
+    PlifyRepository() : base() {}
+}

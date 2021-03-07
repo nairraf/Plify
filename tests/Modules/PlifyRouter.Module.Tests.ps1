@@ -10,10 +10,10 @@ BeforeAll {
 
 Describe 'Get-PlifyVerb Returns Proper Verb' {
     It 'parameter <Name> returns <Expected>' -ForEach @(
-        @{ Name = 'list'; Expected = 'Get' }
-        @{ Name = 'show'; Expected = 'Get' }
-        @{ Name = 'SHoW'; Expected = 'Get' } # to test case
-        @{ Name = 'ls'; Expected = 'Get' }
+        @{ Name = 'list'; Expected = 'Show' }
+        @{ Name = 'show'; Expected = 'Show' }
+        @{ Name = 'SHoW'; Expected = 'Show' } # to test case
+        @{ Name = 'ls'; Expected = 'Show' }
         @{ Name = 'get'; Expected = 'Get' }
         @{ Name = 'new'; Expected = 'New' }
         @{ Name = 'add'; Expected = 'New' }
@@ -90,7 +90,7 @@ Describe 'Build-PlifyModuleName' {
 Describe 'Build-PlifyActionName' {
 
     It 'Returns proper Plify function for Requested Action: <Name>' -ForEach @(
-        @{ Name="show"; Expected="Get-PlifyTestModule" }
+        @{ Name="show"; Expected="Show-PlifyTestModule" }
         @{ Name="add"; Expected="New-PlifyTestModule" }
     ) {
         param($Name, $Expected)

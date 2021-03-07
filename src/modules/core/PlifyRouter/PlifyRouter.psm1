@@ -1,6 +1,6 @@
 function Get-PlifyVerb([string]$Action) {
     foreach ($key in $PlifyActionMapping.Keys) {
-        if ($PlifyActionMapping[$key].Contains($Action.ToLower())) {
+        if ($PlifyActionMapping[$key].ToLower().Contains($Action.ToLower())) {
             return $key
         }
     }
@@ -19,6 +19,7 @@ function Get-PlifyModule() {
 }
 
 function Get-PlifyModuleAction() {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)] [PSModuleInfo] $Module,
         [Parameter(Mandatory=$true)] [string] $ActionName
@@ -53,12 +54,15 @@ function Build-PlifyModuleName() {
 }
 
 function Build-PlifyActionName() {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)] [PSModuleInfo] $Module,
         [Parameter(Mandatory=$true)] [string] $ActionName
     )
 
-    return "$(Get-PlifyVerb($ActionName))-$($Module.Name)"
+    $action = Get-PlifyVerb($ActionName)
+    Write-Debug "Resolved $ActionName to $action"
+    return "$action-$($Module.Name)"
 }
 
 Export-ModuleMember -Function Get-PlifyVerb,Get-PlifyModule,Get-PlifyModuleAction,Build-PlifyModuleName,Build-PlifyActionName
