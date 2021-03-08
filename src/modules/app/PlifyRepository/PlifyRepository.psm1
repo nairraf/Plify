@@ -103,9 +103,7 @@ function Show-PlifyRepository() {
         [Parameter(Mandatory=$false)] [string] $Name = ""
     )
 
-    $repos = Get-PlifyRepository -Name $Name
-    $repos.ExitCode = [int][PlifyStatus]::OK
-    return $repos
+    return Get-PlifyRepository -Name $Name
 }
 
 <#

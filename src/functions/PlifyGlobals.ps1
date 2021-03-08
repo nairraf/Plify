@@ -47,7 +47,7 @@ $Global:PlifyRoutes = @{
     }
     "rl" = @{
         Module="PlifyRepository"
-        Action="Get-PlifyRepository"
+        Action="Show-PlifyRepository"
         Description="Lists plify repositories"
         Equivalent="plify repo list" 
     }
