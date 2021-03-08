@@ -11,6 +11,7 @@ function Global:Write-PlifyErrors() {
         while ($spacer.Length -lt $lineNum.Length) {
             $spacer += " "
         }
+        "Script: $($e.InvocationInfo.ScriptName)"
         "  line #$($lineNum): $($e.InvocationInfo.Line.Trim())"
         "       $($spacer)msg: $($e.Exception.Message)"
         " "

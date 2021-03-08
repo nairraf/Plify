@@ -143,7 +143,11 @@ try {
     # if we don't have a next call, then just output $ret
     # otherwise we display ret and call the next call
     if ( $null -eq $nextCall ) {
-        $ret
+        if ($null -eq $ret.Content) {
+            $ret
+        } else {
+            $ret.Content
+        }
     } else {
         Write-Output ""
         Write-Output "$($ret.Status) - $($ret.Message)"
@@ -159,7 +163,11 @@ try {
             [hashtable] $parms = $ret.NextCall.ActionParams
             if ([string]::IsNullOrEmpty($ModuleFound) -eq $false -and [string]::IsNullOrEmpty($ActionFound) -eq $false){
                 $ret = & $ModuleFound\$ActionFound @parms @extraFlags
-                $ret
+                if ($null -eq $ret.Content) {
+                    $ret
+                } else {
+                    $ret.Content
+                }
             }
         }
     }

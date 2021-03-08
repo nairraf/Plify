@@ -31,6 +31,7 @@ class PlifyNextCall {
 class Plify {
     [int] $ExitCode
     [PlifyStatus] $Status
+    
     PlifyReturnBasic() {
         $this.Status = [PlifyStatus]::OK
         $this.ExitCode = [int][PlifyStatus]::OK
@@ -45,25 +46,26 @@ class Plify {
 
 class PlifyReturn : Plify {
     [string] $Message
+    [string] $Content
     [PlifyNextCall] $NextCall
     PlifyReturn(){}
     PlifyReturn(
         [int] $exitcode,
         [PlifyStatus] $status,
         [string] $message,
-        [PlifyNextCall] $nextCall
+        [PlifyNextCall] $nextCall,
+        [string] $content
     ) {
-        $this.ExitCode = $exitcode
-        $this.Status = $status
+        $this.SetStatus($status)
         $this.Message = $message
         $this.NextCall = $nextCall
+        $this.Content = $content
     }
     PlifyReturn(
         [PlifyStatus] $status,
         [string] $message
     ) {
-        $this.ExitCode = [int]$status
-        $this.Status = $status
+        $this.SetStatus($status)
         $this.Message = $message
     }
     PlifyReturn(
@@ -71,9 +73,13 @@ class PlifyReturn : Plify {
         [string] $message,
         [PlifyNextCall] $nextCall
     ) {
-        $this.ExitCode = [int]$status
-        $this.Status = $status
+        $this.SetStatus($status)
         $this.Message = $message
         $this.NextCall = $nextCall
+    }
+
+    [void]SetStatus([PlifyStatus]$status) {
+        $this.Status = $status
+        $this.ExitCode = [int]$status
     }
 }

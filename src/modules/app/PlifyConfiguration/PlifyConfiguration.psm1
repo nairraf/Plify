@@ -113,10 +113,10 @@ function Show-PlifyConfiguration() {
         [Parameter(Mandatory=$false)] [string] $Scope = "Local",
         [Parameter(Mandatory=$false)] [string] $RootElement = $null
     )
-
-    Get-PlifyConfiguration -Scope $Scope -RootElement $RootElement
-
-    return [Plify]::new()
+    $ret = [PlifyReturn]::new()
+    $ret.SetStatus([PlifyStatus]::OK)
+    $ret.Content = Get-PlifyConfiguration -Scope $Scope -RootElement $RootElement 
+    return $ret
 }
 
 function Set-PlifyGlobalConfig() {
